@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>{{PLAYLIST_TITLE}} – Playlist Overview</title>
+<!--
+  PLAYLIST OVERVIEW TEMPLATE
+  - Built from overview.json and matrix.html (scripts/merge_summaries.py playlist ...), plus each video's summary JSON.
+  - Replace every {{…}} placeholder; repeat or delete example rows. All text in your own words.
+  - Diagrams: copy patterns from assets/diagrams.html (the playlist map is usually "timeline" or "flow").
+  - Page budget: the overview max pages (see SKILL.md). Cut in this order: glossary → flashcards → contradictions.
+-->
+<style>
+@page { size: A4; margin: 16mm; }
+:root { --ink:#1b2430; --muted:#5b6675; --accent:#1f4e8c; --soft:#e8eef7; --line:#d5dce6; --warn:#a15c00; --good:#1e7a4f; }
+* { box-sizing: border-box; }
+body { font-family: "DejaVu Sans","Liberation Sans",Arial,sans-serif; color: var(--ink); font-size: 10pt; line-height: 1.5; margin: 0; background: #fff; }
+h1 { font-size: 23pt; line-height: 1.15; margin: 0 0 6pt; color: var(--accent); }
+h2 { font-size: 15pt; color: var(--accent); margin: 0 0 8pt; padding-bottom: 4pt; border-bottom: 2px solid var(--accent); }
+h3 { font-size: 11.5pt; margin: 14pt 0 5pt; }
+p { margin: 0 0 7pt; }
+ul, ol { margin: 0 0 8pt; padding-left: 16pt; } li { margin-bottom: 3pt; }
+.page { page-break-after: always; } .page:last-child { page-break-after: auto; }
+.muted { color: var(--muted); } .small { font-size: 8.5pt; }
+table { width: 100%; border-collapse: collapse; margin: 4pt 0 10pt; font-size: 9pt; }
+tr { page-break-inside: avoid; }
+th { background: var(--accent); color: #fff; text-align: left; padding: 5pt 6pt; font-weight: 600; }
+td { border-bottom: 1px solid var(--line); padding: 5pt 6pt; vertical-align: top; }
+tr:nth-child(even) td { background: #f7f9fc; }
+.box { background: var(--soft); border-left: 4px solid var(--accent); padding: 8pt 10pt; margin: 6pt 0 10pt; page-break-inside: avoid; }
+.box.warn { background: #fff6e8; border-color: var(--warn); }
+.meta { display: flex; flex-wrap: wrap; gap: 6pt 18pt; font-size: 9pt; color: var(--muted); margin: 8pt 0 14pt; }
+.meta b { color: var(--ink); }
+.tag { display: inline-block; background: var(--accent); color: #fff; padding: 3pt 8pt; font-size: 9pt; letter-spacing: .5pt; margin-bottom: 12pt; }
+.concept { border: 1px solid var(--line); border-left: 4px solid var(--accent); padding: 7pt 10pt; margin-bottom: 8pt; page-break-inside: avoid; }
+.concept b.term { color: var(--accent); font-size: 10.5pt; }
+.concept .eg { color: var(--muted); font-size: 9pt; margin-top: 3pt; }
+.steps { display: flex; gap: 4pt; margin: 6pt 0 12pt; }
+.steps div { flex: 1; background: var(--soft); border-top: 3px solid var(--accent); padding: 6pt 5pt; font-size: 8.5pt; text-align: center; }
+.steps b { display: block; color: var(--accent); font-size: 9.5pt; }
+.remember li { margin-bottom: 5pt; }
+.remember li::marker { color: var(--accent); font-weight: bold; }
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 6pt; }
+.card { border: 1px solid var(--line); padding: 6pt 8pt; page-break-inside: avoid; }
+.card .q { font-weight: 600; } .card .a { color: var(--muted); margin-top: 3pt; font-size: 9pt; }
+.check li { list-style: none; margin-left: -14pt; } .check li::before { content: "☐  "; }
+a { color: var(--accent); text-decoration: none; }
+.viz { margin: 6pt 0 12pt; page-break-inside: avoid; }
+.viz svg { width: 100%; height: auto; display: block; }
+.viz figcaption { font-size: 8.5pt; color: var(--muted); margin-top: 4pt; }
+.viz.half { width: 60%; margin-left: auto; margin-right: auto; }
+.stat { display:inline-block; background: var(--soft); border-radius: 12pt; padding: 2pt 9pt; font-size: 8.5pt; margin-right: 6pt; color: var(--accent); font-weight: 600; }
+.tldr li { margin-bottom: 4pt; }
+.srcbox { border: 1px solid var(--line); padding: 7pt 10pt; font-size: 8.5pt; color: var(--muted); margin-top: 10pt; page-break-inside: avoid; }
+.srcbox a { word-break: break-all; }
+.side { display: flex; gap: 12pt; align-items: flex-start; } .side > * { flex: 1; }
+
+.matrix td, .matrix th { padding: 3pt 5pt; font-size: 8.5pt; }
+</style></head>
+<body>
+
+<!-- 1. COVER -->
+<section class="page">
+  <div class="tag">PLAYLIST OVERVIEW · {{DATE_MADE}}</div>
+  <h1>{{PLAYLIST_TITLE}}</h1>
+  <div class="meta">
+    <span><b>Creator(s):</b> {{CHANNELS}}</span><span><b>Videos covered:</b> {{N}} of {{PLAYLIST_COUNT}}</span>
+    <span><b>Playlist:</b> <a href="{{PLAYLIST_URL}}">{{PLAYLIST_URL}}</a></span>
+  </div>
+  <p><span class="stat">▶ Videos: {{TOTAL_HOURS}} h</span><span class="stat">📄 This overview: ~{{READ_MIN}} min</span><span class="stat">{{PAGES}} pages</span></p>
+
+  <div class="box"><b>The whole playlist in one sentence:</b> {{ONE_SENTENCE}}</div>
+  <h3>In 30 seconds</h3>
+  <ul class="tldr">
+    <li><b>{{KEY_IDEA_1}}</b> {{ONE_LINE}}</li>
+    <li><b>{{KEY_IDEA_2}}</b> {{ONE_LINE}}</li>
+    <li><b>{{KEY_IDEA_3}}</b> {{ONE_LINE}}</li>
+  </ul>
+
+  <h3>If you only read (or watch) one</h3>
+  <table>
+    <tr><th style="width:6%">Rank</th><th>Video</th><th style="width:10%">Length</th><th>Why</th></tr>
+    <tr><td>1</td><td><a href="{{VIDEO_URL}}">#{{n}} {{VIDEO_TITLE}}</a></td><td>{{M:SS}}</td><td>{{WHY}}</td></tr>
+    <!-- rank 3–5 videos by core points and usefulness; say which ones are safe to skip -->
+  </table>
+</section>
+
+<!-- 2. MAP + ORDER -->
+<section class="page">
+  <h2>How the videos fit together</h2>
+  <figure class="viz">{{PLAYLIST_MAP_SVG}}<figcaption><b>Figure 1.</b> {{CAPTION}}</figcaption></figure>
+  <h3>Recommended order</h3>
+  <ol>
+    <li><b>#{{n}} {{VIDEO_TITLE}}</b>: {{WHY_HERE}}</li>
+  </ol>
+  <p class="muted small">{{NOTE if the recommended order differs from the playlist order, and why}}</p>
+</section>
+
+<!-- 3. CONCEPT MATRIX -->
+<section class="page">
+  <h2>Which video covers what</h2>
+  <p>{{ONE_SENTENCE on how to read the grid: shared concepts at the top are the playlist's core.}}</p>
+  {{MATRIX_HTML}}
+  <h3>Repeats and contradictions</h3>
+  <ul>
+    <li><b>Repeated:</b> {{CONCEPT}}: covered in #{{a}} and #{{b}}; #{{best}} explains it best.</li>
+    <li><b>Contradiction:</b> #{{a}} says {{X}}, #{{b}} says {{Y}}. {{Which is right / current, if checked}}</li>
+  </ul>
+</section>
+
+<!-- 4. TOP POINTS + GLOSSARY + FLASHCARDS -->
+<section class="page">
+  <h2>The most important points across all videos</h2>
+  <table>
+    <tr><th style="width:4%">#</th><th style="width:36%">Point</th><th style="width:14%">From</th><th>Why it matters</th></tr>
+    <tr><td>1</td><td>{{POINT}}</td><td><a href="{{URL_WITH_t=SECONDSs}}">#{{n}} · {{M:SS}}</a></td><td>{{WHY}}</td></tr>
+  </table>
+  <h3>Shared glossary</h3>
+  <div class="concept"><b class="term">{{TERM}}</b>: {{PLAIN_EXPLANATION}} <span class="muted small">(videos #{{a}}, #{{b}})</span></div>
+  <h3>Flashcards</h3>
+  <div class="cards">
+    <div class="card"><div class="q">{{QUESTION}}</div><div class="a">{{ANSWER}}</div></div>
+  </div>
+</section>
+
+<!-- 5. INDEX + SOURCES -->
+<section class="page">
+  <h2>Video index</h2>
+  <table>
+    <tr><th style="width:4%">#</th><th>Video</th><th style="width:10%">Length</th><th>In one sentence</th><th style="width:20%">Notes PDF</th></tr>
+    <tr><td>{{n}}</td><td><a href="{{VIDEO_URL}}">{{VIDEO_TITLE}}</a></td><td>{{M:SS}}</td><td>{{ONE_SENTENCE}}</td><td>{{FILE_NAME or "overview only"}}</td></tr>
+  </table>
+  <p class="muted small">Skipped: {{videos skipped and why (no captions, private, over the cap), or "none"}}</p>
+  <div class="srcbox">
+    <b>About this document.</b> Playlist overview generated on {{DATE_MADE}} with the <i>yt-notes</i> skill for Claude,
+    from the captions of {{N}} videos in <a href="{{PLAYLIST_URL}}">“{{PLAYLIST_TITLE}}”</a> by {{CHANNELS}}.
+    The overview and diagrams are an AI-written paraphrase, not a transcript, and may contain mistakes.
+    For anything important, check the original videos. All rights to the videos belong to their creators.
+  </div>
+</section>
+
+</body></html>

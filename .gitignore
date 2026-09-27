@@ -1,10 +1,5 @@
-# Generated output and working files: never commit transcripts or PDFs
-*.pdf
-*.png
-transcript*.txt
-*.meta.json
-*.vtt
-notes*.html
+# Work folders from running the skills: they can hold full transcripts
+yt-notes-work/
 # Tooling
 node_modules/
 __pycache__/

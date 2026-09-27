@@ -7,7 +7,7 @@ Skills for [Claude](https://claude.ai), free and open source. Each skill is one 
 
 | Skill | What it does | Run it with |
 |---|---|---|
-| [yt-notes](yt-notes/) | Turns a YouTube video into a short, visual study-guide PDF | `/yt-notes <youtube-link>` |
+| [yt-notes](yt-notes/) | Turns a YouTube video, a 2+ hour talk or a whole playlist into short, visual study-guide PDFs | `/yt-notes <video-or-playlist-link>` |
 
 ## 1. Get a skill
 
@@ -30,7 +30,8 @@ cd claude-skills
 
 No git? Click **Code > Download ZIP** on this page and unzip it.
 
-To update later, run `git pull` in the `claude-skills` folder and copy the skill again.
+To update later, run `git pull` in the `claude-skills` folder, delete your installed copy of the skill and copy
+the folder again, so files removed in a new version don't stay behind.
 
 ## 2. Install it
 
@@ -73,7 +74,7 @@ only when you type `/yt-notes`.
 ## 4. Use yt-notes
 
 ```
-/yt-notes <youtube-link> [max-pages] [compare] [focus]
+/yt-notes <video-or-playlist-link> [max-pages] [compare] [overview-only] [focus]
 ```
 
 | You type | You get |
@@ -81,8 +82,15 @@ only when you type `/yt-notes`.
 | `/yt-notes https://youtu.be/VIDEO_ID` | It asks how long the PDF should be and whether to compare, then runs |
 | `/yt-notes https://youtu.be/VIDEO_ID 2 no` | A 2 page recap, about 3 minutes of reading |
 | `/yt-notes https://youtu.be/VIDEO_ID 5 articles` | 5 pages, including a comparison with articles |
+| `/yt-notes https://www.youtube.com/playlist?list=PLAYLIST_ID 3 no` | A 3 page PDF per video, plus an overview of the playlist |
+| `/yt-notes https://www.youtube.com/playlist?list=PLAYLIST_ID overview-only` | Only the playlist overview |
 
-It needs Node.js. Setup and what the PDF contains: [yt-notes/README.md](yt-notes/README.md).
+Videos over about an hour are split into parts, summarised part by part and combined, so the middle of the
+video counts as much as the start. Playlists are capped at 10 videos per run.
+
+It needs Node.js. Long videos and playlists also need Python 3, which the skill installs if it is missing.
+It keeps its work files, including full transcripts, in `yt-notes-work/` in your project, so don't commit
+that folder. Setup and what the PDFs contain: [yt-notes/README.md](yt-notes/README.md).
 
 ## Before you install any skill
 

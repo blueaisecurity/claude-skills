@@ -1,0 +1,18 @@
+# Generated output and working files: never commit transcripts or PDFs
+yt-notes-work/
+chunks/
+parts/
+*.json
+!package.json
+*.pdf
+*.png
+transcript*.txt
+*.meta.json
+*.vtt
+notes*.html
+# Tooling
+node_modules/
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db

@@ -3,7 +3,8 @@
 A skill for [Claude](https://claude.ai) (Claude Code and the Claude apps) that converts a YouTube video
 into a short, visual **study-guide PDF**: a 30-second TL;DR, a "should you still watch it?" verdict,
 main points with clickable timestamps, original diagrams, key concepts explained, what to memorise,
-flashcards and a self-test. Optionally it compares the video with other articles and videos.
+flashcards and a self-test. It handles **2+ hour videos** without losing the middle, turns **whole playlists**
+into one overview plus a PDF per video, and can compare a video with other articles and videos.
 
 Most videos are long and most of us don't have time for them. `yt-notes` gives you the useful part in
 5–10 minutes of reading, and links back to the exact moments worth watching.
@@ -11,7 +12,7 @@ Most videos are long and most of us don't have time for them. `yt-notes` gives y
 ## Usage
 
 ```
-/yt-notes <youtube-link> [max-pages] [compare] [focus]
+/yt-notes <video-or-playlist-link> [max-pages] [compare] [overview-only] [focus]
 ```
 
 | You type | You get |
@@ -20,6 +21,8 @@ Most videos are long and most of us don't have time for them. `yt-notes` gives y
 | `/yt-notes https://youtu.be/VIDEO_ID 2 no` | 2-page visual recap (about 3 minutes of reading) |
 | `/yt-notes https://youtu.be/VIDEO_ID 5 articles` | 5 pages, including 1 page comparing the video with articles |
 | `/yt-notes https://youtu.be/VIDEO_ID -> 10 -> both -> for a job interview` | 10-page deep dive, tailored to interview prep, compared with articles and videos |
+| `/yt-notes https://www.youtube.com/playlist?list=PLAYLIST_ID 3 no` | A 3-page PDF per video plus a playlist overview |
+| `/yt-notes https://www.youtube.com/playlist?list=PLAYLIST_ID overview-only` | Just the playlist overview |
 
 - `max-pages`: a hard upper limit (1–30). The skill fits the content and a reading-time budget to it.
 - `compare`: `no`, `articles`, `videos` or `both`.
@@ -41,13 +44,42 @@ Most videos are long and most of us don't have time for them. `yt-notes` gives y
 
 Every page footer links to the original video.
 
+## Long videos (2+ hours)
+
+A single pass over a 2–3 hour transcript tends to over-weight the start and end and flatten the middle.
+For videos over about 60 minutes, `yt-notes`:
+
+1. splits the transcript by the creator's chapters (or 15-minute blocks) with `scripts/chunk_transcript.py`
+2. summarises each part into a standard JSON format (`references/summary-schema.md`), in parallel when
+   the session supports subagents
+3. merges the parts with `scripts/merge_summaries.py video`: removes duplicates, ranks points across the
+   **whole** video, and guarantees that every part with a useful point is represented
+4. adds a **coverage timeline** to the PDF showing which parts of the video the notes draw from, and which
+   were skipped as filler (sponsor reads, intros, breaks)
+
+## Playlists
+
+Give it a playlist link (or several video links) and it lists the videos with their total length, lets you
+choose which to process (up to 10 per run), makes a PDF per video, and then builds an **overview PDF**:
+
+- the playlist in one sentence and a ranked "if you only watch one" table, including which videos are safe to skip
+- a map of how the videos fit together, and a recommended order
+- a concept × video grid showing which video covers what, plus repeats and contradictions
+- the top points across all videos with timestamp links, a shared glossary and flashcards with duplicates removed
+
+Work files go in `yt-notes-work/<VIDEO_ID>/` in your project, so re-runs and interrupted playlists resume where
+they stopped. That folder holds full transcripts, so keep it out of git: add `yt-notes-work/` to your `.gitignore`.
+
+Long videos and playlists are new in this version. So far they have been tested on sample transcripts, not yet on
+real videos. If a run goes wrong, please open an issue.
+
 ## Install
 
 | Where | How |
 |---|---|
 | Claude Code, all projects | Copy this folder to `~/.claude/skills/yt-notes/` (Windows: `%USERPROFILE%\.claude\skills\yt-notes\`) |
 | Claude Code, one project | Copy this folder to `<project>/.claude/skills/yt-notes/` |
-| Claude apps | Zip this folder and upload it as a skill in Settings (the instructions include a fallback for when the scripts aren't bundled) |
+| Claude apps | Zip this folder so the zip holds `yt-notes/SKILL.md`, then add it in **Customize > Skills** (code execution must be on). The instructions include a fallback for when the scripts aren't bundled |
 
 If you have skills with the same name in several places, Claude Code uses the personal one
 (`~/.claude/skills`) over the project one.
@@ -55,8 +87,9 @@ If you have skills with the same name in several places, Claude Code uses the pe
 ## Requirements
 
 - **Node.js** and `npm i -g playwright-core`, used to print the PDF with the Edge or Chrome you already have (no browser download).
-- **Python 3** for the fastest caption route (`yt-dlp`). If Python is missing, the skill installs it
-  (winget on Windows, Homebrew on macOS, apt on Linux), and `yt-dlp` installs itself.
+- **Python 3** for the fastest caption route (`yt-dlp`), and for long videos and playlists (the split and combine
+  scripts). If Python is missing, the skill installs it (winget on Windows, Homebrew on macOS, apt on Linux),
+  and `yt-dlp` installs itself.
 - Optional: `pdftoppm` (poppler) so Claude can look at the pages and check the layout.
 
 ## How it gets the captions
@@ -89,14 +122,22 @@ The PDFs are AI-generated and can contain mistakes, so check the original for an
 yt-notes/
 ├── SKILL.md                    instructions Claude follows
 ├── assets/
-│   ├── template.html           PDF layout (edit colours and sections here)
+│   ├── template.html           study-guide PDF layout (edit colours and sections here)
+│   ├── overview-template.html  playlist overview layout
 │   └── diagrams.html           9 diagram patterns
+├── references/
+│   ├── summary-schema.md       JSON format for part and video summaries
+│   └── part-agent-prompt.md    prompt for parallel part-summary subagents
 └── scripts/
     ├── get_transcript.py       captions via yt-dlp
     ├── capture_captions.js     captions via the browser
+    ├── chunk_transcript.py     split long transcripts by chapter or time
+    ├── merge_summaries.py      combine parts (long video) or videos (playlist); coverage timeline, concept grid
+    ├── list_playlist.py        list a playlist's videos via yt-dlp
+    ├── list_playlist.js        list a playlist's videos via the browser
     └── render_pdf.js           HTML → A4 PDF with source footer, page and reading-time checks
 ```
 
 ## License
 
-MIT, see [LICENSE](../LICENSE).
+MIT, see [LICENSE](LICENSE).
