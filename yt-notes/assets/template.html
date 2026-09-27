@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>{{TITLE}} – Study Notes</title>
+<!--
+  HOW TO FILL THIS TEMPLATE
+  - Replace every {{…}} placeholder. Duplicate or delete example rows and blocks as needed.
+  - Each <section class="page"> starts on a new page. Merge sections if one is nearly empty.
+  - All text in your own words. No transcript passages.
+  - Diagrams: copy <figure class="viz"> patterns from assets/diagrams.html and edit them.
+    Number figures in order (Figure 1, 2, ...). Draw your own diagrams of the ideas; never copy
+    the video's slides, thumbnails, logos or characters.
+  - Page budget: see "Length plan" in SKILL.md. Delete whole sections the budget has no room for.
+-->
+<style>
+@page { size: A4; margin: 16mm; }
+:root { --ink:#1b2430; --muted:#5b6675; --accent:#1f4e8c; --soft:#e8eef7; --line:#d5dce6; --warn:#a15c00; --good:#1e7a4f; }
+* { box-sizing: border-box; }
+body { font-family: "DejaVu Sans","Liberation Sans",Arial,sans-serif; color: var(--ink); font-size: 10pt; line-height: 1.5; margin: 0; background: #fff; }
+h1 { font-size: 23pt; line-height: 1.15; margin: 0 0 6pt; color: var(--accent); }
+h2 { font-size: 15pt; color: var(--accent); margin: 0 0 8pt; padding-bottom: 4pt; border-bottom: 2px solid var(--accent); }
+h3 { font-size: 11.5pt; margin: 14pt 0 5pt; }
+p { margin: 0 0 7pt; }
+ul, ol { margin: 0 0 8pt; padding-left: 16pt; } li { margin-bottom: 3pt; }
+.page { page-break-after: always; } .page:last-child { page-break-after: auto; }
+.muted { color: var(--muted); } .small { font-size: 8.5pt; }
+table { width: 100%; border-collapse: collapse; margin: 4pt 0 10pt; font-size: 9pt; }
+tr { page-break-inside: avoid; }
+th { background: var(--accent); color: #fff; text-align: left; padding: 5pt 6pt; font-weight: 600; }
+td { border-bottom: 1px solid var(--line); padding: 5pt 6pt; vertical-align: top; }
+tr:nth-child(even) td { background: #f7f9fc; }
+.box { background: var(--soft); border-left: 4px solid var(--accent); padding: 8pt 10pt; margin: 6pt 0 10pt; page-break-inside: avoid; }
+.box.warn { background: #fff6e8; border-color: var(--warn); }
+.meta { display: flex; flex-wrap: wrap; gap: 6pt 18pt; font-size: 9pt; color: var(--muted); margin: 8pt 0 14pt; }
+.meta b { color: var(--ink); }
+.tag { display: inline-block; background: var(--accent); color: #fff; padding: 3pt 8pt; font-size: 9pt; letter-spacing: .5pt; margin-bottom: 12pt; }
+.concept { border: 1px solid var(--line); border-left: 4px solid var(--accent); padding: 7pt 10pt; margin-bottom: 8pt; page-break-inside: avoid; }
+.concept b.term { color: var(--accent); font-size: 10.5pt; }
+.concept .eg { color: var(--muted); font-size: 9pt; margin-top: 3pt; }
+.steps { display: flex; gap: 4pt; margin: 6pt 0 12pt; }
+.steps div { flex: 1; background: var(--soft); border-top: 3px solid var(--accent); padding: 6pt 5pt; font-size: 8.5pt; text-align: center; }
+.steps b { display: block; color: var(--accent); font-size: 9.5pt; }
+.remember li { margin-bottom: 5pt; }
+.remember li::marker { color: var(--accent); font-weight: bold; }
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 6pt; }
+.card { border: 1px solid var(--line); padding: 6pt 8pt; page-break-inside: avoid; }
+.card .q { font-weight: 600; } .card .a { color: var(--muted); margin-top: 3pt; font-size: 9pt; }
+.check li { list-style: none; margin-left: -14pt; } .check li::before { content: "☐  "; }
+a { color: var(--accent); text-decoration: none; }
+.viz { margin: 6pt 0 12pt; page-break-inside: avoid; }
+.viz svg { width: 100%; height: auto; display: block; }
+.viz figcaption { font-size: 8.5pt; color: var(--muted); margin-top: 4pt; }
+.viz.half { width: 60%; margin-left: auto; margin-right: auto; }
+.stat { display:inline-block; background: var(--soft); border-radius: 12pt; padding: 2pt 9pt; font-size: 8.5pt; margin-right: 6pt; color: var(--accent); font-weight: 600; }
+.tldr li { margin-bottom: 4pt; }
+.srcbox { border: 1px solid var(--line); padding: 7pt 10pt; font-size: 8.5pt; color: var(--muted); margin-top: 10pt; page-break-inside: avoid; }
+.srcbox a { word-break: break-all; }
+.side { display: flex; gap: 12pt; align-items: flex-start; } .side > * { flex: 1; }
+</style></head>
+<body>
+
+<!-- 1. COVER + SUMMARY -->
+<section class="page">
+  <div class="tag">STUDY NOTES · {{DATE_MADE}}</div>
+  <h1>{{TITLE}}</h1>
+  <div class="meta">
+    <span><b>Creator:</b> {{CHANNEL}}</span><span><b>Published:</b> {{PUBLISHED}}</span>
+    <span><b>Watch:</b> <a href="{{URL}}">{{URL}}</a></span>
+  </div>
+  <p><span class="stat">▶ Video: {{VIDEO_MIN}} min</span><span class="stat">📄 This read: ~{{READ_MIN}} min</span><span class="stat">{{PAGES}} pages</span></p>
+
+  <div class="box"><b>In one sentence:</b> {{ONE_SENTENCE}}</div>
+  <h3>In 30 seconds</h3>
+  <ul class="tldr">
+    <li><b>{{KEY_IDEA_1}}</b> {{ONE_LINE}}</li>
+    <li><b>{{KEY_IDEA_2}}</b> {{ONE_LINE}}</li>
+    <li><b>{{KEY_IDEA_3}}</b> {{ONE_LINE}}</li>
+  </ul>
+  <div class="box warn"><b>Should you still watch it?</b> {{VERDICT: skip it / watch only the parts below / worth watching in full, and why}}
+    <br><b>Best parts:</b> <a href="{{URL_WITH_t=SECONDSs}}">{{M:SS}} {{what}}</a> · <a href="{{URL_WITH_t=SECONDSs}}">{{M:SS}} {{what}}</a></div>
+  <p><b>Who it's for:</b> {{AUDIENCE}}</p>
+
+  <h2 style="margin-top:14pt">Summary</h2>
+  <p>{{SUMMARY_PARAGRAPH_1}}</p>
+  <p>{{SUMMARY_PARAGRAPH_2}}</p>
+  <p>{{SUMMARY_PARAGRAPH_3}}</p>
+</section>
+
+<!-- 1b. VISUAL SUMMARY: always included. One big diagram of the whole video (usually "hub" or "flow"),
+     plus at most one smaller supporting diagram. Can share the page with the summary on short PDFs. -->
+<section class="page">
+  <h2>The video at a glance</h2>
+  <!-- paste a pattern from assets/diagrams.html here -->
+  <figure class="viz">{{MAIN_DIAGRAM_SVG}}<figcaption><b>Figure 1.</b> {{CAPTION}}</figcaption></figure>
+  <div class="box"><b>How to read this:</b> {{ONE_OR_TWO_SENTENCES}}</div>
+</section>
+
+<!-- 2. MAIN POINTS -->
+<section class="page">
+  <h2>Main points</h2>
+  <table>
+    <tr><th style="width:4%">#</th><th style="width:30%">Point</th><th style="width:9%">Time</th><th>Why it matters</th></tr>
+    <tr><td>1</td><td>{{POINT}}</td><td><a href="{{URL_WITH_t=SECONDSs}}">{{M:SS}}</a></td><td>{{WHY_IT_MATTERS}}</td></tr>
+    <!-- Timestamps are links: https://www.youtube.com/watch?v=VIDEO_ID&t=SECONDSs -->
+    <!-- repeat rows: 5–10 points -->
+  </table>
+
+  <h3>Key concepts explained</h3>
+  <div class="concept">
+    <b class="term">{{TERM}}</b>: {{PLAIN_EXPLANATION}}
+    <div class="eg">Example: {{EXAMPLE_OR_ANALOGY}}</div>
+  </div>
+  <!-- A concept that is a process, structure or comparison gets its own small diagram:
+       <figure class="viz half">…</figure> directly under its concept block. -->
+  <!-- repeat concept blocks -->
+</section>
+
+<!-- 3. LEARN AND MEMORISE -->
+<section class="page">
+  <h2>Learn and memorise</h2>
+  <h3>Must remember</h3>
+  <ol class="remember">
+    <li><b>{{SHORT_FACT}}</b> {{ONE_LINE_CONTEXT}}</li>
+    <!-- 5–10 items -->
+  </ol>
+
+  <h3>Frameworks and lists from the video</h3>
+  <!-- Prefer a diagram pattern (flow, cycle, layers, matrix) for frameworks; .steps or a table for simple lists.
+       Delete if the video teaches none. -->
+  <div class="steps">
+    <div><b>1 {{STEP}}</b>{{DESCRIPTION}}</div>
+    <div><b>2 {{STEP}}</b>{{DESCRIPTION}}</div>
+    <div><b>3 {{STEP}}</b>{{DESCRIPTION}}</div>
+  </div>
+
+  <h3>Flashcards</h3>
+  <div class="cards">
+    <div class="card"><div class="q">{{QUESTION}}</div><div class="a">{{ANSWER}}</div></div>
+    <!-- 8–12 cards -->
+  </div>
+</section>
+
+<!-- 4. APPLY + TEST + CAVEATS -->
+<section class="page">
+  <h2>Apply it</h2>
+  <ul class="check">
+    <li>{{CONCRETE_ACTION}}</li>
+    <!-- 3–5 actions -->
+  </ul>
+
+  <h2 style="margin-top:14pt">Test yourself</h2>
+  <ol>
+    <li>{{QUESTION}}</li>
+    <!-- 5–8 questions; answers go on the last page -->
+  </ol>
+
+  <h2 style="margin-top:14pt">Read with care</h2>
+  <div class="box warn">
+    <ul>
+      <li>{{CAVEAT: sales pitch, unsupported claim, dated info, or gap}}</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 5. OPTIONAL: COMPARISON (only added after the user says yes) -->
+<!--
+<section class="page">
+  <h2>How this video compares</h2>
+  <table>
+    <tr><th style="width:28%">Claim</th><th>This video</th><th>Other sources</th><th style="width:13%">Verdict</th></tr>
+    <tr><td>{{CLAIM}}</td><td>{{VIDEO_SAYS}}</td><td>{{OTHERS_SAY}} ({{SOURCE}})</td><td>{{Confirmed/Disputed/Outdated/Unique}}</td></tr>
+  </table>
+  <h3>What others add that this video doesn't</h3><ul><li>{{ITEM}}</li></ul>
+  <h3>Where this video is stronger</h3><ul><li>{{ITEM}}</li></ul>
+  <div class="box"><b>Overall verdict:</b> {{HOW_FAR_TO_TRUST_THE_VIDEO}}</div>
+</section>
+-->
+
+<!-- 6. ANSWERS + SOURCES -->
+<section class="page">
+  <h2>Answers to "Test yourself"</h2>
+  <ol class="small">
+    <li>{{ANSWER}}</li>
+  </ol>
+  <h2 style="margin-top:14pt">Sources</h2>
+  <ul class="small">
+    <li>{{CHANNEL}}, “{{TITLE}}”, YouTube, {{PUBLISHED}}: <a href="{{URL}}">{{URL}}</a></li>
+  </ul>
+  <div class="srcbox">
+    <b>About this document.</b> Study notes generated on {{DATE_MADE}} with the <i>yt-notes</i> skill for Claude,
+    from the {{auto-generated / creator-provided}} captions of
+    <a href="{{URL}}">“{{TITLE}}” by {{CHANNEL}}</a> ({{PUBLISHED}}, {{VIDEO_MIN}} min).
+    The notes and diagrams are an AI-written paraphrase, not a transcript, and may contain mistakes.
+    For anything important, check the original video. All rights to the video belong to its creator.
+  </div>
+</section>
+
+</body></html>
