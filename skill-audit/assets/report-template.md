@@ -4,7 +4,7 @@
 |---|---|
 | **Verdict** | {{✅ No red flags found / ⚠️ Install with changes / ⛔ Don't install}} |
 | **In one line** | {{Why}} |
-| **Audited** | {{path or repo URL}} @ {{commit hash / zip name + date}} |
+| **Audited** | {{path or repo URL}} @ {{commit hash / SHA-256 of each file, listed under Scope}} |
 | **Date** | {{YYYY-MM-DD}} |
 | **Method** | Grep sweep + manual review · {{standard / deep}} |
 

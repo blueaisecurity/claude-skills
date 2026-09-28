@@ -51,11 +51,12 @@ Input: `$ARGUMENTS` (if you see that literal text, read the target from the user
   paths that past git clone exploits used. For a `/tree/<branch>/<path>` link, clone the repo, then audit `<path>`.
   If git isn't available, ask the user to download the repo as a zip and give you the path.
 - **Symbolic links:** before reading anything, list them, and never read through one:
-  `find "<target>" -type l` (macOS, Linux, Git Bash) or `Get-ChildItem "<target>" -Recurse -Attributes ReparsePoint`
-  (PowerShell). A link that points outside the skill (for example to `~/.ssh`) is a ⛔ finding. With the clone above,
+  `find "<target>" -type l` (macOS, Linux, Git Bash) or
+  `Get-ChildItem "<target>" -Recurse -Force -Attributes ReparsePoint` (PowerShell; `-Force` includes hidden items). A link that points outside the skill (for example to `~/.ssh`) is a ⛔ finding. With the clone above,
   links arrive as small text files that hold the target path; report those too.
-- Note the exact version you audit (commit hash from `git -C <folder> rev-parse HEAD`, or the zip's file name and
-  date). The verdict applies to that version only.
+- Note the exact version you audit: the commit hash from `git -C <folder> rev-parse HEAD`, or for a plain folder
+  or zip, a SHA-256 hash of every file (`sha256sum` on macOS and Linux, `Get-FileHash` in PowerShell; the command
+  asks first). The verdict applies to that version only.
 
 ## Step 2: sweep with Grep
 
@@ -67,6 +68,9 @@ Read `references/checklist.md`, then:
    and any `.claude/` folder). Instruction files inside a skill are a finding: a skill never needs them.
 2. **Patterns:** run every pattern in the checklist's section 2 with the Grep tool over the whole target
    (case-insensitive, with line numbers). Note each hit as `file:line`.
+   **Check the coverage.** Grep can skip files named in a `.gitignore`, `.ignore` or `.rgignore`, so a skill can
+   hide a file from the sweep. Read every such ignore file in the target, and read each file it hides in full with
+   Read. An ignore file inside a skill that hides scripts or instructions is a finding.
 3. **Sort what you found**, per skill:
    - **RUNS WITHOUT ASKING:** each `allowed-tools` entry, its risk and why (checklist section 1). An entry inherits
      the worst finding in the script it pre-approves. Also list every load-time command (checklist section 1a), with

@@ -11,6 +11,8 @@ tool (case-insensitive, over the whole skill folder) and read every hit in conte
 | Pre-approved installs (`pip`, `npm`, `npx`, `winget`, `brew`, `apt`), especially with `*` where the package name goes | Installs anything |
 | Pre-approved `curl`, `wget`, `Invoke-WebRequest`, `bash -c`, `powershell`, `python -c`, `node -e`, `rm`, `del`, `git push` | Download, run arbitrary code, delete or publish without asking |
 | Pre-approved scripts | Approving `python x.py` approves every line of `x.py`: read it in full |
+| Plain `Write` or `Edit`, with no path | Changes any file without asking, such as `CLAUDE.md`, `package.json` scripts or CI files. Medium, unless the skill needs to write anywhere. Suggest a path rule for its work folder, and tell the user to test it once |
+| Plain `WebFetch`, together with `Read` and untrusted input (web pages, transcripts, other people's files) | A prompt injection in that input could make Claude put file contents into a URL and fetch it. Medium to high. Suggest letting `WebFetch` ask, or limiting it to the domains the skill needs with `WebFetch(domain:example.com)` |
 | No `disable-model-invocation: true` while pre-approving risky tools | Claude can start it by itself and run those tools |
 | `description` says "always use", "any task", "every request" | Tries to trigger everywhere |
 | `hooks` key | Hooks are registered when the skill runs and keep running shell commands on events (every tool call, every prompt) for the rest of the session. High; critical if a hook downloads, installs or sends data |
@@ -43,10 +45,11 @@ load-time command that nothing pre-approves is medium: whether it runs depends o
 | `.claude-plugin/plugin.json` inside a skill folder | Turns the skill folder into a plugin, which can bring hooks, agents and MCP servers |
 | Symbolic links anywhere | Reading through a link can open files outside the skill (for example `~/.ssh`); list links, never read through them |
 
-## 1c. Files that give Claude instructions
+## 1c. Files that hide other files, or give Claude instructions
 
 | Check | Why it matters |
 |---|---|
+| `.gitignore`, `.ignore` or `.rgignore` inside the target | Grep can skip the files they name, so a file could hide from the sweep. Read each ignore file, then read every file it hides in full |
 | `CLAUDE.md`, `AGENTS.md`, or a `.claude/` folder (`rules/`, `skills/`, `settings.json`) anywhere inside the target | A skill never needs them. When Claude Code reads files in a subfolder of your project, it also loads these from that subfolder, so they can steer Claude, or bring a skill with load-time commands. Report each one, and audit from outside your project |
 
 ## 2. Grep patterns (the Step 2 sweep)
