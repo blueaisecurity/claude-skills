@@ -36,7 +36,7 @@ Instruction files inside the target (`CLAUDE.md`, `AGENTS.md`, `.claude/`): {{li
 
 | What | Type | When | Asks you first? | Version | From |
 |---|---|---|---|---|---|
-| `{{name}}` | {{program / package / library / its own script / shell command / browser script}} | {{step, and on what condition}} | {{No: pre-approved / No: runs when the skill loads / No: inside a script you approved / Yes: permission prompt / Yes: the skill asks, then a permission prompt}} | {{pinned / minimum / newest / n/a}} | {{winget, PyPI, npm, a URL, bundled, already on your computer}} |
+| `{{name}}` | {{program / package / library / its own script / shell command / browser script}} | {{step, and on what condition}} | {{No: pre-approved / No: runs when the skill loads / No: plugin hook / No: inside a script you approved / Yes: permission prompt / Yes: the skill asks, then a permission prompt}} | {{pinned / minimum / newest / n/a}} | {{winget, PyPI, npm, a URL, bundled, already on your computer}} |
 
 In short: it installs {{N}} things, {{all after asking / X without asking}}, and runs {{M}} commands or scripts, {{all after asking / X without asking}}.
 
@@ -62,7 +62,7 @@ Rule: these signals can make the verdict stricter, never better.
 
 ## What it reads and writes
 
-- **Reads:** {{files, folders, environment variables}}
+- **Reads:** {{files, folders, environment variables, Claude's memory}}
 - **Writes:** {{where}}
 
 ## Findings
@@ -72,9 +72,18 @@ Rule: these signals can make the verdict stricter, never better.
 |---|---|---|---|---|
 | 1 | `{{file:line}}` | {{finding}} | {{CRITICAL/HIGH/MEDIUM/LOW}}{{, "for this team; X otherwise" when the context raised it}} | {{Suspicious / Malicious}}: {{why}} |
 
+### Notes (low findings and defects; they don't change the verdict)
+| Where | What | Kind |
+|---|---|---|
+| `{{file:line}}` | {{finding}} | {{Low / Defect}} |
+
+### Worth considering (optional, for ✅)
+{{Easy improvements that aren't required, such as a version pin or `disable-model-invocation`. Or delete this section.}}
+
 ### Decisions for you
-{{Only with context: what the skill's core job means for this audience, for example which account to use, whose
-data goes where, and whether consent is needed. Or delete this section.}}
+{{Trade-offs of the skill's core job that are yours to decide, for example a public preview link, which account to
+use, whose data goes where, and whether consent is needed. With context, say what the audience means for them. Or
+delete this section.}}
 
 ### Expected for its purpose (false positives)
 | Where | Flag | Why it's fine |
@@ -82,6 +91,7 @@ data goes where, and whether consent is needed. Or delete this section.}}
 | `{{file:line}}` | {{rule}} | {{one line}} |
 
 ## Hardening
+{{For ⛔, call this section "What would change the verdict" and say what would have to be true instead.}}
 
 ```yaml
 # before

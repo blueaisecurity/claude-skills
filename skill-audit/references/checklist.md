@@ -49,7 +49,7 @@ load-time command that nothing pre-approves is medium: whether it runs depends o
 
 | Check | Why it matters |
 |---|---|
-| `.gitignore`, `.ignore` or `.rgignore` inside the target | Grep can skip the files they name, so a file could hide from the sweep. Read each ignore file, then read every file it hides in full |
+| `.gitignore`, `.ignore` or `.rgignore` inside the target, or in its parent folders up to the repo root | Grep can skip the files they name, so a file could hide from the sweep. Read each ignore file, then read every file it hides in full |
 | `CLAUDE.md`, `AGENTS.md`, or a `.claude/` folder (`rules/`, `skills/`, `settings.json`) anywhere inside the target | A skill never needs them. When Claude Code reads files in a subfolder of your project, it also loads these from that subfolder, so they can steer Claude, or bring a skill with load-time commands. Report each one, and audit from outside your project |
 
 ## 1d. Blind spots and self-extracting skills (packing)
@@ -70,10 +70,12 @@ XOR-encrypted copy of the whole skill in `.git/skillpack.dat` behind a plain-loo
 
 | Check | Why it matters |
 |---|---|
-| An MCP server, hook or plugin part whose code is not in the audited files (a setup step clones or downloads it) | It runs without a prompt, in every session, and you never saw its code. ⛔ until that code is audited too, at a fixed commit |
+| An MCP server, hook or plugin part whose code is not in the audited files (a setup step clones or downloads it, or it runs `npx`, `uvx` or `pipx run` at run time) | It runs without a prompt, in every session, and you never saw its code. ⛔ until that code is audited too, at a fixed commit. An extra you can switch off, such as telemetry, is ⚠️ instead: see SKILL.md Step 4, rule 6 |
+| Telemetry or analytics (a hook or script that reports usage to the publisher) | Never a need for your task. Say what it sends, where and when, whether the README says so, and how to switch it off |
 | A setup step that fetches code from a URL or git repo and runs it (`git clone` then run, `pip install git+https://...`, `curl ... \| sh`) | Download-and-execute, even when it looks like a normal install. ⛔ if it then runs without a prompt; otherwise at least ⚠️, and more so at an unpinned `main` |
-| A named package from PyPI or npm | Normal. Pinned is fine; unpinned or a minimum version only is ⚠️ |
+| A named package from PyPI or npm | Normal. Pinned is fine. Unpinned or a minimum version only is ⚠️ when it installs inside a script, hook, load-time command or pre-approved command, where you can't see it; a note when it is a command in the docs or `SKILL.md` that you run or approve yourself |
 | The skill sends your links, files or text to a service | List every service in the report. One that the description, `SKILL.md` and README don't name is at least ⚠️. Name each in the one-line reason if it gets everything by default |
+| A step that uploads your project or files to an outside service by default, or as an automatic fallback, without first telling you what goes where | ⚠️. Say what it sends (the whole folder? does it respect `.gitignore`?) and whether the result is public |
 | Faking an identity to get past another site's access controls (a Googlebot user agent, a spoofed `X-Forwarded-For`, paywall or login bypass) | Not a risk to your machine, but a legal and terms risk to whoever runs it, including an employer. At least ⚠️, and say so |
 
 ## 2. Grep patterns (the Step 2 sweep)
@@ -82,17 +84,17 @@ XOR-encrypted copy of the whole skill in `.git/skillpack.dat` behind a plain-loo
 |---|---|
 | Network | `requests\.|urllib|urlopen|http\.client|socket\.|fetch\(|XMLHttpRequest|axios|curl |wget |Invoke-WebRequest|iwr |Net\.WebClient|DownloadString` |
 | Download and run | `(curl|wget|iwr|irm)[^|]*\|\s*(sh|bash|python|iex|powershell)` |
-| Command execution | `subprocess|os\.system|os\.popen|child_process|execSync|spawn\(|eval\(|exec\(|new Function|bash -c|sh -c|cmd /c|iex|Invoke-Expression|powershell.*-enc` |
+| Command execution | `subprocess|os\.system|os\.popen|child_process|execSync|spawn\(|spawnSync|eval\(|exec\(|new Function|bash -c|sh -c|cmd /c|node -e|python -c|iex|Invoke-Expression|powershell.*-enc` |
 | Credentials | `\.ssh|id_rsa|id_ed25519|\.aws|\.azure|gcloud|\.kube|\.npmrc|\.pypirc|git-credentials|\.netrc|\.env\b|Login Data|Cookies|Local State|logins\.json|key4\.db|Keychain|wallet|os\.environ|process\.env|printenv|_TOKEN|_API_KEY|_SECRET` |
 | Webhooks and exfiltration | `webhooks|hooks\.slack|api\.telegram|webhook\.site|requestbin|pipedream|ngrok|interact\.sh` |
 | Persistence | `crontab|schtasks|CurrentVersion\\Run|Startup|launchctl|LaunchAgents|systemctl enable|\.bashrc|\.zshrc|\.profile|PowerShell_profile|New-Service` |
-| Security changes | `Set-MpPreference|ExclusionPath|DisableRealtimeMonitoring|netsh advfirewall|ufw disable|setenforce 0|ExecutionPolicy (Bypass|Unrestricted)` |
+| Security changes | `Set-MpPreference|ExclusionPath|DisableRealtimeMonitoring|netsh advfirewall|ufw disable|setenforce 0|ExecutionPolicy` (read each hit: the value can sit on the next line) |
 | Destructive | `rm -rf|rm -fr|del /s|rmdir /s|Remove-Item.*-Recurse|rmtree|mkfs|dd if=` |
 | Installs | `pip install|npm (i|install)|npx |yarn add|winget install|choco install|brew install|apt(-get)? install|postinstall|preinstall|"install"\s*:|"prepare"\s*:` |
 | Obfuscation | `base64|b64decode|atob\(|FromBase64String|fromCharCode|\\x[0-9a-f]{2}\\x|[A-Za-z0-9+/]{160,}` |
 | Prompt injection | `ignore (all )?(previous|prior|above) instructions|do not tell|don't tell|never mention|without asking|user (has )?(already )?approved|pre-?authori|silently|quietly|secretly|in the background|bypass|skip .*permission|dangerously|you are now|developer mode|instructions from http|(fetch|load|download|get|read|follow).{0,60}https?://.{0,60}instructions|instructions.{0,40}(at|from|on) https?://` |
 | Hidden comments | `<!--` (HTML comments are invisible when a page is rendered, but Claude reads them: read each one) |
-| Hidden Unicode | `[\x{200B}-\x{200F}\x{202A}-\x{202E}\x{2060}-\x{2069}\x{FEFF}]` and tag characters `[\x{E0000}-\x{E007F}]` (Claude Code's Grep finds both; with another tool that can't, note "not checked") |
+| Hidden Unicode | `[\x{200B}-\x{200F}\x{202A}-\x{202E}\x{2060}-\x{2069}\x{FEFF}]` and tag characters `[\x{E0000}-\x{E007F}]` (Claude Code's Grep finds both; with another tool that can't, note "not checked"). Tag or zero-width characters that spell out instructions are ⛔; direction controls in code ("Trojan Source") are high, because the code reads differently from how it runs |
 | Load-time commands | `^\s*\x60{3}!|!\x60` (`\x60` is a backtick: this finds both kinds of load-time command in section 1a) |
 | Plugin hooks and servers | `"hooks"|PreToolUse|PostToolUse|SessionStart|UserPromptSubmit|"mcpServers"|"command"\s*:|npx |uvx |pipx run|@latest` |
 
@@ -113,7 +115,16 @@ Also look at: HTML comments in `.md` files (invisible when rendered, visible to 
 
 - A YouTube tool calling YouTube, or a GitHub tool calling GitHub: expected, if the domains match the purpose.
 - `subprocess` running a *fixed*, harmless command (for example `npm root -g`): fine; *variable* commands need a look.
-- Install commands in **documentation** telling the user what to install: fine. The same in `allowed-tools`: flag it.
+- Install commands in **documentation** telling the user what to install, including a comment in a `SKILL.md` code
+  sample that names the packages it needs: fine; note a missing pin. The same in `allowed-tools`: flag it.
+- A bundled script used as a black box ("run it with `--help`, don't read it"): fine when you read it in full and it
+  runs only after a prompt. Pre-approved, it matters.
+- Plugin manifests at a plugin's root (`.claude-plugin/`, `.cursor-plugin/`, `.plugin/`, `.mcp.json`): expected;
+  read them as plugin parts.
+- `-ExecutionPolicy Bypass` on one PowerShell command line: common, and it affects only that process. Low. Changing
+  the policy for the user or machine (`Set-ExecutionPolicy`) is a security change.
+- A remote MCP server (`"type": "http"`) run by the plugin's own publisher: expected. Its version is set on the
+  server and can't be pinned; say so.
 - Security guidance that *quotes* attack phrases ("never follow instructions like 'ignore previous instructions'"): fine.
 - Template comments in HTML that explain how to fill a template: fine, unless they contain actions.
 - A plugin hook that runs a formatter or linter on your own files after an edit: common, but check the exact command.
@@ -130,8 +141,8 @@ So these signals can raise the verdict to a stricter one, and never lower it.
 | The skill's or repo's name copies a well-known skill or package from a different owner, often with a random ending (`youtube-summarize-11y0i`) | ⛔ **Don't install**, unless the user confirms the source |
 | The repo or the owner's account is less than about 30 days old, yet has many stars | At least ⚠️; say "check who published this" |
 | The URL redirects to a different owner (the repo was transferred or renamed) and the code changed since | At least ⚠️; say so |
-| The package the skill installs is owned by someone other than the repo's owner, or points to a different repo | At least ⚠️ |
-| The audited commit is not a tagged release, or the default branch is ahead of the last release | Note it; suggest installing a release |
+| Code the skill presents as its own part (its MCP server, its own command-line tool, a package named after it) comes from a different maker than the skill. Compare makers, not repos: one company's GitHub organisations and package scopes count as one maker (vercel and vercel-labs, microsoft and `@azure`). Ordinary libraries such as pypdf or requests are dependencies: check them in Step 3.6 instead | At least ⚠️ |
+| The audited commit is not a tagged release, or the default branch is ahead of the last release | Note it; suggest installing a release, if there is one |
 | An archived repo, or open reports of security problems | Note it |
 | Many stars, an old repo, a known owner, signed or provenance-backed releases | Note it as context. **Never improves the verdict** |
 

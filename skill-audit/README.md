@@ -77,7 +77,11 @@ the command. With no browser you get the summary as an HTML page instead.
    suspicious, explains false positives, and checks dependencies.
 3. **Verdict, hardening and a report.** When a skill sits between two verdicts, it always gets the stricter one.
    Anything the audit couldn't read never counts in the skill's favour: an MCP server or hook whose code is
-   downloaded at install, and wasn't audited, means "don't install" until it is.
+   downloaded at install, and wasn't audited, means "don't install" until it is. One exception: when that part is
+   an extra the skill doesn't need, such as telemetry, and you can switch it off before first use, the verdict is
+   "install with changes", and switching it off is the first change. Small risks and plain bugs are listed as
+   notes and don't change the verdict. A clean skill can still come with optional "worth considering" changes,
+   such as pinning a version.
 
 ## Antivirus note
 
@@ -141,7 +145,11 @@ audit it: **re-audit on every update**, and use Claude Code's deny rules and san
 
 **What it catches, and what still gets past it.** skill-audit reads a skill; it never runs it. In our tests it
 found all nine attacks planted in a fake malicious skill, from a stolen SSH key to instructions hidden in invisible
-characters. The paper [Cloak and Detonate](https://arxiv.org/abs/2607.02357) (July 2026) shows two ways to hide the
+characters. We also ran it blind on five official skills and plugins, to check that it doesn't cry wolf. The first
+run flagged two of Anthropic's own skills for things that weren't risks, and the rules were fixed. Now Anthropic's
+`frontend-design`, `pdf` and `webapp-testing` come out with no red flags. Two from other vendors get "install with
+changes", for real findings confirmed in their code. The fake malicious skill and a packed skill still get "don't
+install". The paper [Cloak and Detonate](https://arxiv.org/abs/2607.02357) (July 2026) shows two ways to hide the
 same attacks from a tool that reads:
 
 1. **Packing.** A harmless-looking `SKILL.md` runs a small decoder that unpacks the real skill on first run from an
