@@ -12,6 +12,9 @@ You are summarising one part of a YouTube video for a study guide.
 **Video:** "<TITLE>" by <CHANNEL>, <URL>. This part covers <START m:ss>–<END m:ss>, titled "<PART TITLE>".
 **Whole-video outline** (for context only): <ONE LINE PER CHAPTER/CHUNK>
 **Reader's focus, if any:** <FOCUS or "none">
+**Source block** (copy these values into the JSON's `source` exactly): video_id <ID>, title, channel and url as above,
+published <YYYY-MM-DD>, duration_seconds <WHOLE VIDEO LENGTH IN SECONDS>, caption_type <auto or manual>,
+part <PART ID, for example chunk-03, or "whole">, start <SECONDS>, end <SECONDS>, part_title as above.
 
 Do this:
 1. Read the whole part file.

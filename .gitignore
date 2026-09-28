@@ -1,5 +1,6 @@
-# Work folders from running the skills: they can hold full transcripts
+# Work folders and reports from running the skills: they can hold full transcripts
 yt-notes-work/
+skill-audit-*.md
 # Tooling
 node_modules/
 __pycache__/

@@ -1,7 +1,7 @@
 # Structured summary format
 
 One JSON file per **part**. A part is a chunk of a long video, or a whole video when it isn't chunked
-(and in playlist mode). `merge_summaries.py` reads these files, so keep the field names exactly as shown.
+(and in playlist mode). `merge_summaries.js` reads these files, so keep the field names exactly as shown.
 Write every text field in your own words; never paste transcript sentences.
 
 ```json

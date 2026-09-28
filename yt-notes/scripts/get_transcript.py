@@ -1,24 +1,31 @@
 """Download a YouTube video's subtitles as timestamped text using yt-dlp.
 
-Usage: python get_transcript.py <url> [--out transcript.txt] [--lang en]
+Usage: python get_transcript.py <url> [--out transcript.txt] [--lang en] [--install-ytdlp]
 Prints BLOCKED if YouTube can't be reached, NO_SUBTITLES if the video has none.
+Prints NEED_YTDLP if yt-dlp isn't installed; ask the user, then run again with --install-ytdlp.
 Writes <out> (text) and <out-stem>.meta.json (title, channel, date, duration, chapters).
 """
 import argparse
+import atexit
 import glob
+import html
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
 
 
-def ensure_ytdlp():
+def ensure_ytdlp(install):
     try:
         import yt_dlp  # noqa: F401
     except ImportError:
-        cmd = [sys.executable, "-m", "pip", "install", "-q", "yt-dlp"]
+        if not install:
+            print("NEED_YTDLP: yt-dlp isn't installed. Ask the user first, then run again with --install-ytdlp.")
+            sys.exit(4)
+        cmd = [sys.executable, "-m", "pip", "install", "-q", "yt-dlp>=2026.8.19"]  # minimum version; YouTube changes often, so no exact pin
         if subprocess.call(cmd) != 0:
             subprocess.call(cmd + ["--break-system-packages"])
 
@@ -30,7 +37,7 @@ def ts(sec):
 
 def vtt_to_blocks(path, block_chars=500):
     """Parse WebVTT, drop the rolling duplicates auto-captions produce, group into ~500-char blocks."""
-    cues, seen = [], set()
+    cues = []
     with open(path, encoding="utf-8") as f:
         text = f.read()
     for block in re.split(r"\n\s*\n", text):
@@ -41,10 +48,11 @@ def vtt_to_blocks(path, block_chars=500):
         for line in block.splitlines():
             if "-->" in line:
                 continue
-            line = re.sub(r"<[^>]+>", "", line).strip()
-            if not line or line in seen:
+            line = re.sub(r"<[^>]+>", "", line)
+            line = re.sub(r"\s+", " ", html.unescape(line)).strip()  # creator captions carry &nbsp; and &amp;
+            # auto-captions repeat the previous line in the next cue; only skip those, keep real repeats
+            if not line or line in (c[1] for c in cues[-3:]):
                 continue
-            seen.add(line)
             cues.append((start, line))
     out, buf, first = [], "", None
     for start, line in cues:
@@ -60,20 +68,24 @@ def vtt_to_blocks(path, block_chars=500):
 
 
 def main():
+    if hasattr(sys.stdout, "reconfigure"):  # Windows consoles default to cp1252, which garbles titles
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     ap = argparse.ArgumentParser()
     ap.add_argument("url")
     ap.add_argument("--out", default="transcript.txt")
     ap.add_argument("--lang", default="en")
+    ap.add_argument("--install-ytdlp", action="store_true", help="install yt-dlp with pip if it's missing (ask the user first)")
     a = ap.parse_args()
 
-    ensure_ytdlp()
+    ensure_ytdlp(a.install_ytdlp)
     import yt_dlp
 
     tmp = tempfile.mkdtemp()
+    atexit.register(shutil.rmtree, tmp, ignore_errors=True)  # the raw subtitle files are not kept
     opts = {
         "skip_download": True, "writesubtitles": True, "writeautomaticsub": True,
         "subtitleslangs": [a.lang, f"{a.lang}.*"], "subtitlesformat": "vtt",
-        "outtmpl": os.path.join(tmp, "%(id)s.%(ext)s"), "quiet": True, "no_warnings": True,
+        "outtmpl": os.path.join(tmp, "%(id)s.%(ext)s"), "quiet": True, "no_warnings": True, "noprogress": True,
     }
     try:
         with yt_dlp.YoutubeDL(opts) as ydl:
@@ -91,12 +103,15 @@ def main():
     with open(a.out, "w", encoding="utf-8") as f:
         f.write(vtt_to_blocks(files[0]))
 
+    chosen = os.path.basename(files[0])  # "<id>.<lang>.vtt"
+    lang = chosen[len(str(info.get("id"))) + 1:-4]
     meta = {
         "title": info.get("title"), "channel": info.get("channel") or info.get("uploader"),
         "upload_date": info.get("upload_date"), "duration_seconds": info.get("duration"),
-        "url": info.get("webpage_url"), "subtitle_file": os.path.basename(files[0]),
+        "url": info.get("webpage_url"), "subtitle_file": chosen,
+        "caption_type": "manual" if lang in (info.get("subtitles") or {}) else "auto",
         "chapters": [{"start": ts(c["start_time"]), "title": c["title"]} for c in (info.get("chapters") or [])],
-        "description": (info.get("description") or "")[:2500],
+        "description": (info.get("description") or "")[:5000],
     }
     meta_path = os.path.splitext(a.out)[0] + ".meta.json"
     with open(meta_path, "w", encoding="utf-8") as f:

@@ -8,12 +8,13 @@ const fs = require('fs');
 const { execSync } = require('child_process');
 
 function load() {
-  const roots = [''];
-  try { roots.push(execSync('npm root -g').toString().trim() + path.sep); } catch (e) {}
-  for (const root of roots) for (const mod of ['playwright-core', 'playwright']) {
-    try { return require(root + mod); } catch (e) {}
+  // Look in the current folder first (where "npm i playwright-core" puts it), then next to this script, then global.
+  const paths = [process.cwd(), __dirname];
+  try { paths.push(execSync('npm root -g').toString().trim()); } catch (e) {}
+  for (const mod of ['playwright-core', 'playwright']) {
+    try { return require(require.resolve(mod, { paths })); } catch (e) {}
   }
-  console.error('MISSING_PLAYWRIGHT: run  npm i playwright-core  (or npm i -g playwright-core) and retry.');
+  console.error('MISSING_PLAYWRIGHT: run  npm i playwright-core  in this folder (or npm i -g playwright-core) and retry.');
   process.exit(1);
 }
 

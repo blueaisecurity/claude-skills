@@ -1,0 +1,8 @@
+# Audit output and working files
+skill-audit-*.md
+*.zip
+# Tooling
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db

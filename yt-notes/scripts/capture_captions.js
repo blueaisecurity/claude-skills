@@ -45,7 +45,7 @@ const meta = {
   videoId, title: vd.title, channel: vd.author, lengthSeconds: Number(vd.lengthSeconds) || null,
   date: pr.microformat?.playerMicroformatRenderer?.publishDate,
   captionTrack: en ? `${en.languageCode} (${en.kind || 'manual'})` : 'NONE',
-  descriptionStart: (vd.shortDescription || '').slice(0, 2500)
+  descriptionStart: (vd.shortDescription || '').slice(0, 5000)
 };
 
 let result;

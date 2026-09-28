@@ -1,7 +1,8 @@
 """List the videos in a YouTube playlist without downloading anything (uses yt-dlp).
 
-Usage: python list_playlist.py <playlist-url> [--out playlist.json] [--max 50]
-Prints BLOCKED if YouTube can't be reached. Otherwise prints a numbered list with durations
+Usage: python list_playlist.py <playlist-url> [--out playlist.json] [--max 50] [--install-ytdlp]
+Prints BLOCKED if YouTube can't be reached, and NEED_YTDLP if yt-dlp isn't installed (ask the user, then run
+again with --install-ytdlp). Otherwise prints a numbered list with durations
 and writes <out>: {"title", "channel", "url", "count", "total_seconds", "videos": [{n, id, title, url, duration_seconds}]}
 """
 import argparse
@@ -10,11 +11,14 @@ import subprocess
 import sys
 
 
-def ensure_ytdlp():
+def ensure_ytdlp(install):
     try:
         import yt_dlp  # noqa: F401
     except ImportError:
-        cmd = [sys.executable, "-m", "pip", "install", "-q", "yt-dlp"]
+        if not install:
+            print("NEED_YTDLP: yt-dlp isn't installed. Ask the user first, then run again with --install-ytdlp.")
+            sys.exit(4)
+        cmd = [sys.executable, "-m", "pip", "install", "-q", "yt-dlp>=2026.8.19"]  # minimum version; YouTube changes often, so no exact pin
         if subprocess.call(cmd) != 0:
             subprocess.call(cmd + ["--break-system-packages"])
 
@@ -26,17 +30,20 @@ def fmt(sec):
 
 
 def main():
+    if hasattr(sys.stdout, "reconfigure"):  # Windows consoles default to cp1252, which garbles titles
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     ap = argparse.ArgumentParser()
     ap.add_argument("url")
     ap.add_argument("--out", default="playlist.json")
     ap.add_argument("--max", type=int, default=50)
+    ap.add_argument("--install-ytdlp", action="store_true", help="install yt-dlp with pip if it's missing (ask the user first)")
     a = ap.parse_args()
 
-    ensure_ytdlp()
+    ensure_ytdlp(a.install_ytdlp)
     import yt_dlp
 
     opts = {"extract_flat": "in_playlist", "skip_download": True, "quiet": True, "no_warnings": True,
-            "playlistend": a.max}
+            "noprogress": True, "playlistend": a.max}
     try:
         with yt_dlp.YoutubeDL(opts) as ydl:
             info = ydl.extract_info(a.url, download=False)

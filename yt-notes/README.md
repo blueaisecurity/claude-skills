@@ -49,10 +49,11 @@ Every page footer links to the original video.
 A single pass over a 2–3 hour transcript tends to over-weight the start and end and flatten the middle.
 For videos over about 60 minutes, `yt-notes`:
 
-1. splits the transcript by the creator's chapters (or 15-minute blocks) with `scripts/chunk_transcript.py`
+1. splits the transcript by the creator's chapters (from YouTube, or read from the description), or into 15-minute
+   blocks, with `scripts/chunk_transcript.js`
 2. summarises each part into a standard JSON format (`references/summary-schema.md`), in parallel when
    the session supports subagents
-3. merges the parts with `scripts/merge_summaries.py video`: removes duplicates, ranks points across the
+3. merges the parts with `scripts/merge_summaries.js video`: removes duplicates, ranks points across the
    **whole** video, and guarantees that every part with a useful point is represented
 4. adds a **coverage timeline** to the PDF showing which parts of the video the notes draw from, and which
    were skipped as filler (sponsor reads, intros, breaks)
@@ -68,10 +69,11 @@ choose which to process (up to 10 per run), makes a PDF per video, and then buil
 - the top points across all videos with timestamp links, a shared glossary and flashcards with duplicates removed
 
 Work files go in `yt-notes-work/<VIDEO_ID>/` in your project, so re-runs and interrupted playlists resume where
-they stopped. That folder holds full transcripts, so keep it out of git: add `yt-notes-work/` to your `.gitignore`.
+they stopped. That folder holds full transcripts, so the skill puts a `.gitignore` inside it and git never picks
+it up.
 
-Long videos and playlists are new in this version. So far they have been tested on sample transcripts, not yet on
-real videos. If a run goes wrong, please open an issue.
+Long videos and playlists are new in this version. They were tested on a 93-minute podcast with 16 chapters
+(9 parts, summarised in parallel) and on 4 videos from a playlist. If a run goes wrong, please open an issue.
 
 ## Install
 
@@ -79,17 +81,18 @@ real videos. If a run goes wrong, please open an issue.
 |---|---|
 | Claude Code, all projects | Copy this folder to `~/.claude/skills/yt-notes/` (Windows: `%USERPROFILE%\.claude\skills\yt-notes\`) |
 | Claude Code, one project | Copy this folder to `<project>/.claude/skills/yt-notes/` |
-| Claude apps | Zip this folder so the zip holds `yt-notes/SKILL.md`, then add it in **Customize > Skills** (code execution must be on). The instructions include a fallback for when the scripts aren't bundled |
+| Claude apps | In your copy, delete the `argument-hint` and `disable-model-invocation` lines at the top of `SKILL.md` (the apps accept only `name`, `description`, `allowed-tools`, `license`, `compatibility` and `metadata`, and reject the upload otherwise). Zip the folder so the zip holds `yt-notes/SKILL.md`, then add it in **Customize > Skills** (code execution must be on). The instructions include a fallback for when the scripts aren't bundled |
 
 If you have skills with the same name in several places, Claude Code uses the personal one
 (`~/.claude/skills`) over the project one.
 
 ## Requirements
 
-- **Node.js** and `npm i -g playwright-core`, used to print the PDF with the Edge or Chrome you already have (no browser download).
-- **Python 3** for the fastest caption route (`yt-dlp`), and for long videos and playlists (the split and combine
-  scripts). If Python is missing, the skill installs it (winget on Windows, Homebrew on macOS, apt on Linux),
-  and `yt-dlp` installs itself.
+- **Node.js** and `npm i -g playwright-core`, used to print the PDF with the Edge or Chrome you already have
+  (no browser download), and to split and combine long videos and playlists.
+- **Python 3** (optional) for the fastest caption route (`yt-dlp`). Without it, the skill reads the captions
+  through the browser. If Python or `yt-dlp` is missing, the skill asks before installing anything
+  (winget on Windows, Homebrew on macOS, apt on Linux, then pip for `yt-dlp`).
 - Optional: `pdftoppm` (poppler) so Claude can look at the pages and check the layout.
 
 ## How it gets the captions
@@ -108,7 +111,32 @@ If you have skills with the same name in several places, Claude Code uses the pe
 - **Reading-time budget.** `render_pdf.js` counts pages and words and warns when the PDF is over the limit.
 - **Fact-checking.** Up to three key claims are checked against primary sources, and anything sponsored or sold in the video is flagged.
 - **Prompt-injection safe.** Transcripts and web pages are treated as data, never as instructions.
-- **Least privilege.** In Claude Code, `allowed-tools` pre-approves only the skill's own scripts and the Python install; everything else asks first.
+- **Least privilege.** Only harmless commands run without asking, and nothing is installed without your yes
+  (see Security below).
+
+## Security
+
+This skill was checked with [skill-audit](../skill-audit/) before release.
+
+**Runs without asking (`allowed-tools`):** `python --version`, `py --version`, `python3 --version`, `Read`, `Write`,
+`WebSearch`, `WebFetch`. Nothing else. Its scripts and `pdftoppm` each ask the first time; in Claude Code you can
+choose "Yes, and don't ask again", so **you** decide what runs silently, not the skill's author.
+
+**What each script does:**
+
+| Script | Reads | Runs | Network |
+|---|---|---|---|
+| `get_transcript.py` | nothing of yours | `pip install yt-dlp`, only with `--install-ytdlp` after you agree | YouTube (captions), PyPI |
+| `list_playlist.py` | nothing of yours | `pip install yt-dlp`, only with `--install-ytdlp` after you agree | YouTube (playlist list), PyPI |
+| `chunk_transcript.js` | the transcript file | nothing | none |
+| `merge_summaries.js` | the summary JSON files | nothing | none |
+| `render_pdf.js` | the notes HTML | `npm root -g`; your installed Edge/Chrome (headless) | none |
+| `capture_captions.js` | runs inside the YouTube tab; records the player's own caption response | nothing | none of its own |
+| `list_playlist.js` | runs inside the YouTube playlist tab; reads the page | nothing | none of its own |
+
+Installs it may perform, always after asking you: Python (winget, Homebrew or apt), `yt-dlp` (PyPI, version
+2026.8.19 or newer), `playwright-core` (npm). Transcripts and web pages are treated as untrusted data, never as
+instructions.
 
 ## Responsible use
 
@@ -131,8 +159,8 @@ yt-notes/
 └── scripts/
     ├── get_transcript.py       captions via yt-dlp
     ├── capture_captions.js     captions via the browser
-    ├── chunk_transcript.py     split long transcripts by chapter or time
-    ├── merge_summaries.py      combine parts (long video) or videos (playlist); coverage timeline, concept grid
+    ├── chunk_transcript.js     split long transcripts by chapter or time
+    ├── merge_summaries.js      combine parts (long video) or videos (playlist); coverage timeline, concept grid
     ├── list_playlist.py        list a playlist's videos via yt-dlp
     ├── list_playlist.js        list a playlist's videos via the browser
     └── render_pdf.js           HTML → A4 PDF with source footer, page and reading-time checks
