@@ -52,6 +52,20 @@ load-time command that nothing pre-approves is medium: whether it runs depends o
 | `.gitignore`, `.ignore` or `.rgignore` inside the target | Grep can skip the files they name, so a file could hide from the sweep. Read each ignore file, then read every file it hides in full |
 | `CLAUDE.md`, `AGENTS.md`, or a `.claude/` folder (`rules/`, `skills/`, `settings.json`) anywhere inside the target | A skill never needs them. When Claude Code reads files in a subfolder of your project, it also loads these from that subfolder, so they can steer Claude, or bring a skill with load-time commands. Report each one, and audit from outside your project |
 
+## 1d. Blind spots and self-extracting skills (packing)
+
+Grep does not search inside `.git/`, and skips what ignore files name, so a payload can ride along where the sweep
+never looks and be unpacked at first run. The paper [Cloak and Detonate](https://arxiv.org/abs/2607.02357) hides an
+XOR-encrypted copy of the whole skill in `.git/skillpack.dat` behind a plain-looking `SKILL.md` cover.
+
+| Check | Why it matters |
+|---|---|
+| A `.git/` folder inside a skill | Grep never looks here. At the root of a clone you made, git's own files are expected (`HEAD`, `config`, `objects/`, `refs/` and so on, see Step 2.1); skip them. Git can't commit files into `.git/`, so any other file there, or any `.git/` in a zip, a local folder or a subfolder, was put there by whoever packaged the skill: read it. An encoded or high-entropy blob (for example `skillpack.dat`) is a ⛔ finding. So is a git hook that isn't a `.sample` file, because it runs on git commands |
+| `node_modules/`, `vendor/`, `.cache/`, `dist/`, `build/`, or any dotfile or dot-folder that isn't `.gitignore` | Blind spots a scanner tends to skip. A skill's own files are its `SKILL.md`, scripts, references and assets. Anything else here, read it |
+| A script that decodes, decrypts or unpacks a file (`base64 -d`, `xor`, `unzip`, `tar -x`, `zlib`) and then writes or runs the result inside the skill's folder | The self-extracting pattern: the real skill appears only at runtime. ⛔ |
+| `SKILL.md` refers to a file the skill doesn't contain (for example a `WORKFLOW.md` it never ships) | A cover that points to instructions a decoder will create. ⛔ if a script would create it, otherwise a low finding |
+| A file whose bytes look random or are one long encoded string | Can't be reviewed by reading. Say so, and don't clear the skill on the strength of a review |
+
 ## 2. Grep patterns (the Step 2 sweep)
 
 | Category | Pattern (regex, case-insensitive) |

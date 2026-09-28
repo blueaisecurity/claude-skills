@@ -85,6 +85,6 @@ after:  {{hardened allowed-tools line}}</pre>
 
 <footer>
   Full report: <code>{{REPORT_FILE}}.md</code>. Version audited: {{commit hash, or "SHA-256 of each file, in the full report"}}.
-  A static review lowers risk; it doesn't prove a skill is safe. Re-audit after every update.
+  A static review lowers risk; it doesn't prove a skill is safe. A command split into pieces at runtime can slip past a review, so run a skill you don't trust in a sandbox. Re-audit after every update.
 </footer>
 </body></html>

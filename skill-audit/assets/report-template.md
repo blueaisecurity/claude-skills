@@ -89,5 +89,10 @@ Other changes: {{wording to remove, scripts to change, or "none"}}
 - Files read in full: {{list}}
 - Files checked by the pattern sweep only: {{list or "none"}}
 - Symbolic links: {{list with targets, or "none"}}
+- Blind spots read by hand (`.git/`, ignored files, `node_modules/` and the like): {{list or "none"}}
+- **What a review can't catch:** a command or path split into pieces and rebuilt at runtime can slip past both the
+  patterns and a read. The only full answer is to run the skill in a sandbox and watch what it does. For a skill you
+  don't trust, do that, and after its first run compare the file hashes above with the skill's files, since a
+  self-extracting skill rewrites itself.
 - Not covered: dependencies weren't audited recursively; binaries and archives can't be reviewed by reading;
   a static review can't prove a skill is safe. **Re-audit after every update.**

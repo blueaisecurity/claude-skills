@@ -118,23 +118,26 @@ A static review lowers risk; it doesn't prove a skill is safe. Patterns catch kn
 dependencies aren't audited recursively, binaries can't be reviewed by reading, and a skill can change after you
 audit it: **re-audit on every update**, and use Claude Code's deny rules and sandboxing as a second line of defence.
 
-**What it catches, and what gets past it.** skill-audit reads a skill; it never runs it. In our test it found all
-nine attacks planted in a fake malicious skill, from a stolen SSH key to instructions hidden in invisible
-characters. The paper [Cloak and Detonate](https://arxiv.org/abs/2607.02357) (July 2026) shows two ways to hide
-the same attacks from any tool that reads, and they work on this one too:
+**What it catches, and what still gets past it.** skill-audit reads a skill; it never runs it. In our tests it
+found all nine attacks planted in a fake malicious skill, from a stolen SSH key to instructions hidden in invisible
+characters. The paper [Cloak and Detonate](https://arxiv.org/abs/2607.02357) (July 2026) shows two ways to hide the
+same attacks from a tool that reads:
 
-1. **Split-up strings.** A command like `curl` or a path like `~/.aws/credentials` is assembled from pieces at
-   runtime, so no pattern matches. Claude may still spot code that builds commands at runtime, but only in the
-   files it reads in full; use `deep` for skills you don't know.
-2. **Packing.** A harmless-looking `SKILL.md` runs a small decoder that unpacks the real skill on first run from an
-   encrypted file. The paper hides that file in `.git/`, and Claude Code's Grep does not search `.git/`, so the
-   pattern sweep never sees it. The file list does show it: any `.git/` folder, blob or archive inside a skill,
-   and any file that `SKILL.md` refers to but the skill doesn't contain, is worth a close look.
+1. **Packing.** A harmless-looking `SKILL.md` runs a small decoder that unpacks the real skill on first run from an
+   encoded file, which the paper hides in `.git/`. Claude Code's Grep does not search `.git/`, so the pattern sweep
+   never sees it. **skill-audit now catches this:** it lists the blind-spot folders (`.git/`, `node_modules/`,
+   dotfiles) and reads what's inside, flags a `SKILL.md` that points to a file the skill doesn't ship, and flags a
+   script that decodes or unpacks a file into the skill's folder. Any of those is "don't install". We tested it on a
+   packed skill built like the paper's example, and it caught all three.
+2. **Split-up strings, which still gets past it.** A command like `curl` or a path like `~/.aws/credentials`
+   assembled from pieces at runtime matches no pattern. Claude may spot code that builds commands at runtime, but
+   only in the files it reads in full, and not reliably. This is the real limit of any reader, and skill-audit does
+   not close it. Use `deep` for skills you don't know, and don't rely on the review alone.
 
-The paper's answer is to run a skill in a sandbox and watch what it does, which caught 87 percent of real malicious
-skills, packed or not. So treat skill-audit as hygiene, not as a trust gate: for skills you don't trust, run them in
-a sandbox, and compare the file hashes in the report with the skill's files after its first run, since a packed
-skill rewrites itself.
+The paper's answer to that last gap is to run a skill in a sandbox and watch what it does, which caught 87 percent
+of real malicious skills, packed or not. So treat skill-audit as a cheap pre-filter, not a trust gate: for skills
+you don't trust, run them in a sandbox, and compare the file hashes in the report with the skill's files after its
+first run, since a self-extracting skill rewrites itself.
 
 ## Install
 
