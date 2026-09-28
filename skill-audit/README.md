@@ -118,6 +118,24 @@ A static review lowers risk; it doesn't prove a skill is safe. Patterns catch kn
 dependencies aren't audited recursively, binaries can't be reviewed by reading, and a skill can change after you
 audit it: **re-audit on every update**, and use Claude Code's deny rules and sandboxing as a second line of defence.
 
+**What it catches, and what gets past it.** skill-audit reads a skill; it never runs it. In our test it found all
+nine attacks planted in a fake malicious skill, from a stolen SSH key to instructions hidden in invisible
+characters. The paper [Cloak and Detonate](https://arxiv.org/abs/2607.02357) (July 2026) shows two ways to hide
+the same attacks from any tool that reads, and they work on this one too:
+
+1. **Split-up strings.** A command like `curl` or a path like `~/.aws/credentials` is assembled from pieces at
+   runtime, so no pattern matches. Claude may still spot code that builds commands at runtime, but only in the
+   files it reads in full; use `deep` for skills you don't know.
+2. **Packing.** A harmless-looking `SKILL.md` runs a small decoder that unpacks the real skill on first run from an
+   encrypted file. The paper hides that file in `.git/`, and Claude Code's Grep does not search `.git/`, so the
+   pattern sweep never sees it. The file list does show it: any `.git/` folder, blob or archive inside a skill,
+   and any file that `SKILL.md` refers to but the skill doesn't contain, is worth a close look.
+
+The paper's answer is to run a skill in a sandbox and watch what it does, which caught 87 percent of real malicious
+skills, packed or not. So treat skill-audit as hygiene, not as a trust gate: for skills you don't trust, run them in
+a sandbox, and compare the file hashes in the report with the skill's files after its first run, since a packed
+skill rewrites itself.
+
 ## Install
 
 | Where | How |
