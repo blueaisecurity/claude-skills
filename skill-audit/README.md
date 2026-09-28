@@ -12,11 +12,15 @@ runs a pre-approved command the moment you start the skill, before Claude has re
 - **everything it installs and runs**, in one table: programs, packages, libraries, scripts and commands, each
   with its version and whether you're asked first
 - **where it connects and what it reads and writes**
-- **what's hidden**: obfuscated code, encoded commands, invisible Unicode, instructions in HTML comments
-- **whether it tries to manipulate Claude**: "ignore previous instructions", "don't tell the user", fake "the user approved"
+- **what's hidden**: obfuscated code, encoded commands, invisible Unicode, instructions in HTML comments, files
+  hidden from the search by an ignore file, and `CLAUDE.md` files or symbolic links tucked inside a skill
+- **whether it tries to manipulate Claude**: "ignore previous instructions", "don't tell the user", fake "the user
+  approved", or instructions fetched from the web after you reviewed it
 - **for plugins, what runs on its own**: hooks that fire on events and MCP servers that start programs
+- **install tricks**: install hooks in `package.json`, unpinned packages, and zips with entries that try to escape
 - a verdict: **✅ No red flags found · ⚠️ Install with changes · ⛔ Don't install**
 - a **hardened** version of its permissions
+- a **full report**, plus a **one-page PDF summary** per skill
 
 ## Usage
 
@@ -84,9 +88,26 @@ never brings you a file your antivirus may flag.
 - **It audits from outside your project.** When Claude Code reads files in a subfolder of your project, it also
   loads that subfolder's `CLAUDE.md` files and skills. So downloads are audited in a temporary folder outside your
   project, and it asks you to move a download that sits inside it. For extra safety while you check skills you
-  don't trust, set `"disableSkillShellExecution": true` in your Claude Code settings, so no skill's load-time
-  commands run, even ones your own allow rules would let through.
+  don't trust, turn off load-time commands (next section).
 - **It never modifies the original skill.** Hardened copies go to a new folder, on request.
+
+## Turn off commands that run when a skill loads
+
+A line in a skill's `SKILL.md` can run a command the moment you start the skill, before Claude reads the rest.
+Claude Code checks it against your permission rules, but never shows you a prompt for it. If you don't need
+this feature, turn it off in your Claude Code settings file: `~/.claude/settings.json`, on Windows
+`%USERPROFILE%\.claude\settings.json`. If the file doesn't exist, create it with this:
+
+```json
+{
+  "disableSkillShellExecution": true
+}
+```
+
+If it already has settings, add `"disableSkillShellExecution": true` as one more line inside the outer braces,
+with a comma after the line before it. From then on, Claude Code skips these commands in the skills you and your
+projects install. It doesn't cover skills your organisation manages centrally or skills built into Claude Code.
+skill-audit finds these lines either way and shows what each one runs; it never changes your settings.
 
 ## Limits
 
