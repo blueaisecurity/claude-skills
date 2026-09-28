@@ -64,10 +64,11 @@ load-time command that nothing pre-approves is medium: whether it runs depends o
 | Persistence | `crontab|schtasks|CurrentVersion\\Run|Startup|launchctl|LaunchAgents|systemctl enable|\.bashrc|\.zshrc|\.profile|PowerShell_profile|New-Service` |
 | Security changes | `Set-MpPreference|ExclusionPath|DisableRealtimeMonitoring|netsh advfirewall|ufw disable|setenforce 0|ExecutionPolicy (Bypass|Unrestricted)` |
 | Destructive | `rm -rf|rm -fr|del /s|rmdir /s|Remove-Item.*-Recurse|rmtree|mkfs|dd if=` |
-| Installs | `pip install|npm (i|install)|npx |yarn add|winget install|choco install|brew install|apt(-get)? install|postinstall|preinstall` |
+| Installs | `pip install|npm (i|install)|npx |yarn add|winget install|choco install|brew install|apt(-get)? install|postinstall|preinstall|"install"\s*:|"prepare"\s*:` |
 | Obfuscation | `base64|b64decode|atob\(|FromBase64String|fromCharCode|\\x[0-9a-f]{2}\\x|[A-Za-z0-9+/]{160,}` |
-| Prompt injection | `ignore (all )?(previous|prior|above) instructions|do not tell|don't tell|never mention|without asking|user (has )?(already )?approved|pre-?authori|silently|quietly|secretly|in the background|bypass|skip .*permission|dangerously|you are now|developer mode|instructions from http` |
-| Hidden Unicode | `[\x{200B}-\x{200F}\x{202A}-\x{202E}\x{2060}-\x{2069}\x{FEFF}]` and tag characters `[\x{E0000}-\x{E007F}]` (if the tool supports them; otherwise note "not checked") |
+| Prompt injection | `ignore (all )?(previous|prior|above) instructions|do not tell|don't tell|never mention|without asking|user (has )?(already )?approved|pre-?authori|silently|quietly|secretly|in the background|bypass|skip .*permission|dangerously|you are now|developer mode|instructions from http|(fetch|load|download|get|read|follow).{0,60}https?://.{0,60}instructions|instructions.{0,40}(at|from|on) https?://` |
+| Hidden comments | `<!--` (HTML comments are invisible when a page is rendered, but Claude reads them: read each one) |
+| Hidden Unicode | `[\x{200B}-\x{200F}\x{202A}-\x{202E}\x{2060}-\x{2069}\x{FEFF}]` and tag characters `[\x{E0000}-\x{E007F}]` (Claude Code's Grep finds both; with another tool that can't, note "not checked") |
 | Load-time commands | `^\s*\x60{3}!|!\x60` (`\x60` is a backtick: this finds both kinds of load-time command in section 1a) |
 | Plugin hooks and servers | `"hooks"|PreToolUse|PostToolUse|SessionStart|UserPromptSubmit|"mcpServers"|"command"\s*:|npx |uvx |pipx run|@latest` |
 
