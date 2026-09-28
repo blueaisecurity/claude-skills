@@ -28,7 +28,7 @@ runs a pre-approved command the moment you start the skill, before Claude has re
 ## Usage
 
 ```
-/skill-audit <skill-folder | github-url | skill.zip> [deep]
+/skill-audit <skill-folder | github-url | skill.zip> [deep] [context: who made it, where it came from, who will use it]
 ```
 
 | You type | It audits |
@@ -38,6 +38,25 @@ runs a pre-approved command the moment you start the skill, before Claude has re
 | `/skill-audit cool-skill.zip` | A zipped skill (extracted into a new folder; entries that try to leave it are skipped) |
 | `/skill-audit ~/.claude/skills` | All your installed personal skills, with a summary table |
 | `/skill-audit ./some-skill deep` | Also reads every file in full, not only flagged and pre-approved ones |
+| `/skill-audit ./onboarding context: built by our HR team, used by recruiters` | Also checks the skill against what you say it is and who will use it |
+
+### Adding context
+
+Tell skill-audit what you know about the skill, in your own words, after `context:`. For example, "built
+internally by the platform team", "downloaded from a public marketplace", or "the HR team will use it with
+candidate data". It uses the context in three ways:
+
+1. **Purpose.** Does the skill do only what you say it's for? A recruiting skill that uploads files to a web
+   service, or an "internal" tool that calls outside servers, is a finding.
+2. **Stakes.** Who will use it sets how much a finding weighs. For a sensitive audience (HR, finance, legal,
+   admins, anyone with customer or production data) or a wide one (a company-wide marketplace), risky findings
+   count more.
+3. **Origin.** Your claim is checked against the files. "Internal" should match the owner, domains and package
+   names in the code. If the files say otherwise, that's a finding in itself.
+
+Context can mark a finding as expected when the files back it up, and it can make a finding more serious. It
+never removes a reason not to install, and the report says what the context changed. Without context, the audit
+runs as usual.
 
 The full report is saved as `skill-audit-<name>-<date>.md` in your current folder, with a short PDF summary
 next to it: one page per skill with the verdict, what runs without asking, what it installs, where it connects,

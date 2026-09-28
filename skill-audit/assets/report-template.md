@@ -7,12 +7,16 @@
 | **Audited** | {{path or repo URL}} @ {{commit hash / SHA-256 of each file, listed under Scope}} |
 | **Date** | {{YYYY-MM-DD}} |
 | **Method** | Grep sweep + manual review · {{standard / deep}} |
+| **Context** | {{what the user said about origin, maker and audience, or "none given"}} |
 
 ## What it claims vs what it does
 
 - **Claims (description):** {{…}}
+- **Context says it is for:** {{the purpose and audience the user gave, or "none given"}}
 - **Actually does:** {{plain-language summary of what SKILL.md tells Claude to do and what the scripts do}}
-- **Match?** {{Yes / partly / no, with why}}
+- **Match?** {{Yes / partly / no, with why, against both the description and the context}}
+- **Context checked against the files:** {{matches / contradicts: which file, owner, domain or path}}
+- **What the context changed:** {{findings relabelled as expected, findings rated more serious, or "nothing"}}
 
 ## What it can do without asking you
 

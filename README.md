@@ -86,7 +86,7 @@ anything. It keeps its work files, including full transcripts, in `yt-notes-work
 ## 4. Use skill-audit
 
 ```
-/skill-audit <skill-folder | github-url | skill.zip> [deep]
+/skill-audit <skill-folder | github-url | skill.zip> [deep] [context: who made it, where it came from, who will use it]
 ```
 
 | You type | It checks |
@@ -94,10 +94,13 @@ anything. It keeps its work files, including full transcripts, in `yt-notes-work
 | `/skill-audit ./downloads/cool-skill` | One skill folder |
 | `/skill-audit https://github.com/someone/their-skills` | Every skill in a repo (you approve the clone first) |
 | `/skill-audit ~/.claude/skills` | All your installed personal skills, with a summary table |
+| `/skill-audit ./onboarding context: built by our HR team, used by recruiters` | One skill, checked against what you say it is and who will use it |
 
 You get a verdict (no red flags found, install with changes, or don't install), what the skill can do without
 asking you, everything it installs and runs, where it comes from, the top risks, and safer permissions. It comes as a full report and
-a short PDF summary, next to where you run it. It only uses Claude's
+a short PDF summary, next to where you run it. Context is optional: it tells the audit what the skill should do and
+who will use it, so it can spot a skill that does more than that. It is checked against the files, and it never
+removes a reason not to install. It only uses Claude's
 own Read, Grep and Glob tools and never runs anything from the skill it checks. Details:
 [skill-audit/README.md](skill-audit/README.md).
 

@@ -12,6 +12,9 @@
   - Keep each skill to one page: at most 3 risks, and at most 7 rows in "What it installs and runs"
     (group similar rows, for example "its 5 scripts").
   - Asks first class: "yes" for any prompt or question, "no" for pre-approved, load-time or inside an approved script.
+  - For a "Don't install" verdict, retitle "Safer settings" as "What would change the verdict" and say what would
+    have to be true, for example "audit the MCP server's code at a fixed commit".
+  - No context given: write "none given" in the Context box. Context that the files contradict goes in bold.
 -->
 <style>
 @page { size: A4; margin: 14mm; }
@@ -64,6 +67,7 @@ code { font-family: Consolas, "DejaVu Sans Mono", monospace; font-size: 9pt; }
     <div class="fact"><b>Can start by itself</b>{{Yes, when … / No, only when you type /name}}</div>
     <div class="fact"><b>Installs</b>{{N things, all after asking / X without asking / nothing}}</div>
     <div class="fact"><b>Connects to</b>{{domains, or "nothing"}}</div>
+    <div class="fact wide"><b>Context</b>{{what you said about it, whether the files match, and what that changed; or "none given"}}</div>
     <div class="fact wide"><b>Where it comes from</b>{{owner, repo age, stars, release, and anything that made the verdict stricter; or "not checked"}}. Popularity never improves the verdict.</div>
   </div>
 
