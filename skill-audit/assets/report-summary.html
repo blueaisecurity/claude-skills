@@ -40,7 +40,7 @@ h3 { font-size: 10.5pt; color: #1f4e8c; margin: 8pt 0 3pt; }
 ol { margin: 0; padding-left: 16pt; } li { margin-bottom: 3pt; }
 .yes { color: #1e7a4f; font-weight: 700; } .no { color: #b42318; font-weight: 700; }
 pre { background: #f4f6f9; border: 1px solid #d5dce6; border-radius: 4pt; padding: 6pt 8pt; font-size: 8.5pt; white-space: pre-wrap; margin: 0; }
-footer { margin-top: 12pt; padding-top: 6pt; border-top: 1px solid #d5dce6; font-size: 8.5pt; color: #5b6675; }
+footer { margin-top: 8pt; padding-top: 4pt; border-top: 1px solid #d5dce6; font-size: 8pt; color: #5b6675; }
 code { font-family: Consolas, "DejaVu Sans Mono", monospace; font-size: 9pt; }
 </style></head>
 <body>
@@ -85,6 +85,6 @@ after:  {{hardened allowed-tools line}}</pre>
 
 <footer>
   Full report: <code>{{REPORT_FILE}}.md</code>. Version audited: {{commit hash, or "SHA-256 of each file, in the full report"}}.
-  A static review lowers risk; it doesn't prove a skill is safe. A command split into pieces at runtime can slip past a review, so run a skill you don't trust in a sandbox. Re-audit after every update.
+  A review lowers risk but can't prove a skill safe; split-up commands can slip past it, so run skills you don't trust in a sandbox. Re-audit after every update.
 </footer>
 </body></html>
