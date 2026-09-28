@@ -81,7 +81,7 @@ video counts as much as the start. Playlists are capped at 10 videos per run.
 
 It needs Node.js. Python 3 is optional and makes getting captions faster; the skill asks before installing
 anything. It keeps its work files, including full transcripts, in `yt-notes-work/` in your project, with a
-`.gitignore` inside so git leaves them alone. Setup and what the PDFs contain: [yt-notes/README.md](yt-notes/README.md).
+`.gitignore` inside so git ignores them. Setup and what the PDFs contain: [yt-notes/README.md](yt-notes/README.md).
 
 ## 4. Use skill-audit
 
@@ -96,7 +96,7 @@ anything. It keeps its work files, including full transcripts, in `yt-notes-work
 | `/skill-audit ~/.claude/skills` | All your installed personal skills, with a summary table |
 | `/skill-audit ./onboarding context: built by our HR team, used by recruiters` | One skill, checked against what you say it is and who will use it |
 
-You get a verdict (no red flags found, install with changes, or don't install), what the skill can do without
+You get a verdict (no problems found, install with changes, or don't install), what the skill can do without
 asking you, everything it installs and runs, where it comes from, the top risks, and safer permissions. It comes as a full report and
 a short PDF summary, next to where you run it. Context is optional: it tells the audit what the skill should do and
 who will use it, so it can spot a skill that does more than that. It is checked against the files, and it never
@@ -108,7 +108,7 @@ own Read, Grep and Glob tools and never runs anything from the skill it checks. 
 
 A skill can run commands on your computer: its `allowed-tools` line can let commands run without asking you,
 a line like `` !`command` `` in its `SKILL.md` runs a pre-approved command the moment you start it, before
-Claude reads anything, and its scripts run with your rights. Read its `SKILL.md` and scripts first, or run `/skill-audit` on it. That goes for ours too.
+Claude reads anything, and its scripts run with your rights. Read its `SKILL.md` and scripts first, or run `/skill-audit` on it. Do the same for our skills.
 
 ## If your antivirus flags a file
 
@@ -130,7 +130,7 @@ installing a skill never brings you such a file.
 3. **Scripts and templates** in the skill folder are opened only when a step needs them.
 4. **Same skill in two places?** This order decides which one runs: your organisation's managed skills
    first, then personal (`~/.claude/skills`), then project (`.claude/skills`). So a personal copy of
-   `yt-notes` wins over a project copy.
+   `yt-notes` is used instead of a project copy.
 
 Claude can also start a skill by itself when your request matches its description. `yt-notes` is set to run
 only when you type `/yt-notes`. `skill-audit` can also start when you ask Claude to check a skill; it only reads.

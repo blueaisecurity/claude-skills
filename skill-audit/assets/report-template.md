@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Verdict** | {{✅ No red flags found / ⚠️ Install with changes / ⛔ Don't install}} (between two verdicts, always the stricter one; name the fact that decided it) |
+| **Verdict** | {{✅ No problems found / ⚠️ Install with changes / ⛔ Don't install}} (between two verdicts, always the stricter one; name the fact that decided it) |
 | **In one line** | {{Why}} |
 | **Audited** | {{path or repo URL}} @ {{commit hash / SHA-256 of each file, listed under Scope}} |
 | **Date** | {{YYYY-MM-DD}} |

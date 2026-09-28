@@ -3,11 +3,11 @@
 A skill for [Claude](https://claude.ai) (Claude Code and the Claude apps) that converts a YouTube video
 into a short, visual **study-guide PDF**: a 30-second TL;DR, a "should you still watch it?" verdict,
 main points with clickable timestamps, original diagrams, key concepts explained, what to memorise,
-flashcards and a self-test. It handles **2+ hour videos** without losing the middle, turns **whole playlists**
+flashcards and a self-test. It handles **2+ hour videos**, covering the middle as well as the start and end, turns **whole playlists**
 into one overview plus a PDF per video, and can compare a video with other articles and videos.
 
 Most videos are long and most of us don't have time for them. `yt-notes` gives you the useful part in
-5–10 minutes of reading, and links back to the exact moments worth watching.
+5 to 10 minutes of reading, and links back to the exact moments worth watching.
 
 ## Usage
 
@@ -20,11 +20,11 @@ Most videos are long and most of us don't have time for them. `yt-notes` gives y
 | `/yt-notes https://youtu.be/VIDEO_ID` | It asks how long the PDF should be and whether to compare, then runs |
 | `/yt-notes https://youtu.be/VIDEO_ID 2 no` | 2-page visual recap (about 3 minutes of reading) |
 | `/yt-notes https://youtu.be/VIDEO_ID 5 articles` | 5 pages, including 1 page comparing the video with articles |
-| `/yt-notes https://youtu.be/VIDEO_ID -> 10 -> both -> for a job interview` | 10-page deep dive, tailored to interview prep, compared with articles and videos |
+| `/yt-notes https://youtu.be/VIDEO_ID -> 10 -> both -> for a job interview` | A detailed 10-page guide, written for interview prep, compared with articles and videos |
 | `/yt-notes https://www.youtube.com/playlist?list=PLAYLIST_ID 3 no` | A 3-page PDF per video plus a playlist overview |
 | `/yt-notes https://www.youtube.com/playlist?list=PLAYLIST_ID overview-only` | Just the playlist overview |
 
-- `max-pages`: a hard upper limit (1–30). The skill fits the content and a reading-time budget to it.
+- `max-pages`: a hard upper limit (1 to 30). The skill fits the content and a reading-time budget to it.
 - `compare`: `no`, `articles`, `videos` or `both`.
 - `focus`: anything else, for example "beginner level" or "answer in Spanish".
 
@@ -33,8 +33,8 @@ Most videos are long and most of us don't have time for them. `yt-notes` gives y
 | Section | Purpose |
 |---|---|
 | Cover | One-sentence summary, 3 key ideas, **should you still watch it?** (with timestamps), video length vs reading time |
-| The video at a glance | One diagram of the whole video |
-| Main points | 5–10 points with clickable timestamps and why each matters |
+| The whole video in one picture | One diagram of the whole video |
+| Main points | 5 to 10 points with clickable timestamps and why each matters |
 | Key concepts | Plain-language explanations, examples and small diagrams |
 | Learn and memorise | Must-remember list, frameworks drawn as diagrams, flashcards |
 | Apply it / Test yourself | Practical actions and self-test questions (answers at the end) |
@@ -46,7 +46,8 @@ Every page footer links to the original video.
 
 ## Long videos (2+ hours)
 
-A single pass over a 2–3 hour transcript tends to over-weight the start and end and flatten the middle.
+A single pass over a 2 to 3 hour transcript tends to give too much weight to the start and end, and too little to
+the middle.
 For videos over about 60 minutes, `yt-notes`:
 
 1. splits the transcript by the creator's chapters (from YouTube, or read from the description), or into 15-minute
@@ -69,8 +70,7 @@ choose which to process (up to 10 per run), makes a PDF per video, and then buil
 - the top points across all videos with timestamp links, a shared glossary and flashcards with duplicates removed
 
 Work files go in `yt-notes-work/<VIDEO_ID>/` in your project, so re-runs and interrupted playlists resume where
-they stopped. That folder holds full transcripts, so the skill puts a `.gitignore` inside it and git never picks
-it up.
+they stopped. That folder holds full transcripts, so the skill puts a `.gitignore` inside it and git ignores it.
 
 Long videos and playlists are new in this version. They were tested on a 93-minute podcast with 16 chapters
 (9 parts, summarised in parallel) and on 4 videos from a playlist. If a run goes wrong, please open an issue.
@@ -111,7 +111,7 @@ If you have skills with the same name in several places, Claude Code uses the pe
 - **Reading-time budget.** `render_pdf.js` counts pages and words and warns when the PDF is over the limit.
 - **Fact-checking.** Up to three key claims are checked against primary sources, and anything sponsored or sold in the video is flagged.
 - **Prompt-injection safe.** Transcripts and web pages are treated as data, never as instructions.
-- **Least privilege.** Only harmless commands run without asking, and nothing is installed without your yes
+- **Least privilege.** Only harmless commands run without asking, and nothing is installed unless you agree
   (see Security below).
 
 ## Security

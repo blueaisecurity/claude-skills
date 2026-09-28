@@ -163,7 +163,7 @@ node "<skill-dir>/scripts/merge_summaries.js" video parts --index chunks/index.j
    as "Jailbreak" and "Jailbreaking"), and fill the freed slots from
    `reserve` (the next best points), preferring concrete ones: evidence, examples, advice. Swap within the same part
    where you can, so the numbers on the coverage timeline stay right.
-5. **Add the coverage timeline** (`coverage.svg`) to the "video at a glance" page, captioned
+5. **Add the coverage timeline** (`coverage.svg`) to the "whole video in one picture" page, captioned
    "Which parts of the video these notes draw from". If it printed `THIN_PARTS`, add one line listing what those
    parts covered ("Also covered: …"). If it printed `COVERAGE_OVER_BUDGET`, group the main-points table by chapter.
 
@@ -221,7 +221,7 @@ at-a-glance diagram, the main points or "must remember".
    "In one sentence"; **In 30 seconds** (3 key ideas); **Should you still watch it?** (skip / watch these
    parts / watch in full, with 1–3 clickable timestamps); who it's for.
 2. **Summary**: 3–5 short paragraphs telling the story of the video.
-3. **The video at a glance**: one big diagram of the whole video (always included).
+3. **The whole video in one picture**: one big diagram of the whole video (always included).
 4. **Main points**: table with #, point, **clickable** timestamp, and a short explanation of *why it matters*.
    Timestamp links use `https://www.youtube.com/watch?v=<VIDEO_ID>&t=<SECONDS>s`.
 5. **Key concepts explained**: each term in plain words, plus an example or analogy; a small diagram under

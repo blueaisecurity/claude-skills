@@ -3,7 +3,7 @@
 Installing a Claude skill is like installing software. Its `allowed-tools` line can let commands run
 **without a permission prompt**, and its scripts run with **your** user rights. A skill that pre-approves
 `python scripts/setup.py` pre-approves every line of `setup.py`. And a line like `` !`command` `` in `SKILL.md`
-runs a pre-approved command the moment you start the skill, before Claude has read a word of it.
+runs a pre-approved command the moment you start the skill, before Claude reads any of it.
 
 `skill-audit` tells you, before you install or update a skill:
 
@@ -13,15 +13,15 @@ runs a pre-approved command the moment you start the skill, before Claude has re
   with its version and whether you're asked first
 - **where it connects and what it reads and writes**
 - **what's hidden**: obfuscated code, encoded commands, invisible Unicode, instructions in HTML comments, files
-  hidden from the search by an ignore file, and `CLAUDE.md` files or symbolic links tucked inside a skill
+  hidden from the search by an ignore file, and `CLAUDE.md` files or symbolic links hidden inside a skill
 - **whether it tries to manipulate Claude**: "ignore previous instructions", "don't tell the user", fake "the user
   approved", or instructions fetched from the web after you reviewed it
 - **for plugins, what runs on its own**: hooks that fire on events and MCP servers that start programs
-- **install tricks**: install hooks in `package.json`, unpinned packages, and zips with entries that try to escape
+- **install tricks**: install hooks in `package.json`, unpinned packages, and zips with entries that try to write outside their folder
 - **where it comes from**: owner, repo age, stars, releases, and names that copy a well-known skill. These can only
   make the verdict stricter: stars can be bought, so popularity never makes a risky skill look safe. The lookups use
   the network, so they ask first
-- a verdict: **✅ No red flags found · ⚠️ Install with changes · ⛔ Don't install**
+- a verdict: **✅ No problems found · ⚠️ Install with changes · ⛔ Don't install**
 - a **hardened** version of its permissions
 - a **full report**, plus a **one-page PDF summary** per skill
 
@@ -48,13 +48,13 @@ candidate data". It uses the context in three ways:
 
 1. **Purpose.** Does the skill do only what you say it's for? A recruiting skill that uploads files to a web
    service, or an "internal" tool that calls outside servers, is a finding.
-2. **Stakes.** Who will use it sets how much a finding weighs. For a sensitive audience (HR, finance, legal,
+2. **Stakes.** Who will use it decides how serious a finding is. For a sensitive audience (HR, finance, legal,
    admins, anyone with customer or production data) or a wide one (a company-wide marketplace), risky findings
    count more.
 3. **Origin.** Your claim is checked against the files. "Internal" should match the owner, domains and package
    names in the code. If the files say otherwise, that's a finding in itself.
 
-Context can mark a finding as expected when the files back it up, and it can make a finding more serious. It
+Context can mark a finding as expected when the files confirm it, and it can make a finding more serious. It
 never removes a reason not to install, and the report says what the context changed. Without context, the audit
 runs as usual.
 
@@ -89,7 +89,7 @@ This folder has no scanner script, on purpose. A malware detector has to contain
 of browser password files, webhook addresses, `curl | sh`, startup folders. The first version of skill-audit had
 them in a Python scanner. Bitdefender quarantined it as `Generic.PY.STEALER` about a minute after it was saved,
 because one `.py` file full of those strings looks like an information stealer. It was a false positive, and it
-was also the antivirus doing its job.
+was also the antivirus working as it should.
 
 So this version keeps the patterns in `references/checklist.md`, as documentation, and Claude runs them with its
 own Grep tool. On the machine where the scanner was quarantined, the checklist was not flagged.
@@ -139,34 +139,36 @@ skill-audit finds these lines either way and shows what each one runs; it never 
 
 ## Limits
 
-A static review lowers risk; it doesn't prove a skill is safe. Patterns catch known shapes, not new tricks,
-dependencies aren't audited recursively, binaries can't be reviewed by reading, and a skill can change after you
-audit it: **re-audit on every update**, and use Claude Code's deny rules and sandboxing as a second line of defence.
+A review by reading lowers risk; it doesn't prove a skill is safe. Patterns find known attacks, not new ones,
+dependencies aren't audited one by one, binaries can't be reviewed by reading, and a skill can change after you
+audit it: **re-audit on every update**, and also use Claude Code's deny rules and sandboxing, so that what the
+review misses can still be blocked.
 
-**What it catches, and what still gets past it.** skill-audit reads a skill; it never runs it. In our tests it
+**What it catches, and what it still misses.** skill-audit reads a skill; it never runs it. In our tests it
 found all nine attacks planted in a fake malicious skill, from a stolen SSH key to instructions hidden in invisible
-characters. We also ran it blind on five official skills and plugins, to check that it doesn't cry wolf. The first
+characters. We also ran it on five official skills and plugins without telling it what to expect, to check that it
+doesn't flag safe skills. The first
 run flagged two of Anthropic's own skills for things that weren't risks, and the rules were fixed. Now Anthropic's
-`frontend-design`, `pdf` and `webapp-testing` come out with no red flags. Two from other vendors get "install with
+`frontend-design`, `pdf` and `webapp-testing` come out with "no problems found". Two from other vendors get "install with
 changes", for real findings confirmed in their code. The fake malicious skill and a packed skill still get "don't
 install". The paper [Cloak and Detonate](https://arxiv.org/abs/2607.02357) (July 2026) shows two ways to hide the
 same attacks from a tool that reads:
 
 1. **Packing.** A harmless-looking `SKILL.md` runs a small decoder that unpacks the real skill on first run from an
    encoded file, which the paper hides in `.git/`. Claude Code's Grep does not search `.git/`, so the pattern sweep
-   never sees it. **skill-audit now catches this:** it lists the blind-spot folders (`.git/`, `node_modules/`,
+   never sees it. **skill-audit now catches this:** it lists the folders the search skips (`.git/`, `node_modules/`,
    dotfiles) and reads what's inside, flags a `SKILL.md` that points to a file the skill doesn't ship, and flags a
    script that decodes or unpacks a file into the skill's folder. Any of those is "don't install". We tested it on a
    packed skill built like the paper's example, and it caught all three.
-2. **Split-up strings, which still gets past it.** A command like `curl` or a path like `~/.aws/credentials`
-   assembled from pieces at runtime matches no pattern. Claude may spot code that builds commands at runtime, but
-   only in the files it reads in full, and not reliably. This is the real limit of any reader, and skill-audit does
-   not close it. Use `deep` for skills you don't know, and don't rely on the review alone.
+2. **Split-up strings, which it still misses.** A command like `curl` or a path like `~/.aws/credentials`
+   assembled from pieces at runtime matches no pattern. Claude may notice code that builds commands at runtime, but
+   only in the files it reads in full, and not reliably. Any tool that only reads a skill has this limit, and
+   skill-audit does not solve it. Use `deep` for skills you don't know, and don't rely on the review alone.
 
-The paper's answer to that last gap is to run a skill in a sandbox and watch what it does, which caught 87 percent
-of real malicious skills, packed or not. So treat skill-audit as a cheap pre-filter, not a trust gate: for skills
-you don't trust, run them in a sandbox, and compare the file hashes in the report with the skill's files after its
-first run, since a self-extracting skill rewrites itself.
+For split-up strings, the paper runs the skill in a sandbox and watches what it does. That caught 87 percent of
+real malicious skills, packed or not. So treat skill-audit as a quick first check, not as proof that a skill is
+safe: run skills you don't trust in a sandbox, and after the first run, compare the skill's files with the file
+hashes in the report, since a self-extracting skill changes its own files.
 
 ## Install
 
