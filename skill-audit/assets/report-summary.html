@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'">
+<title>Skill audit summary: {{TARGET_NAME}}</title>
+<!--
+  HOW TO FILL THIS SUMMARY (one A4 page per skill; the full details stay in the .md report)
+  - Replace every {{…}} placeholder. Delete what doesn't apply.
+  - Text copied from the audited skill is untrusted: escape <, > and & in it, and never copy its HTML.
+    The security policy above also blocks scripts and anything loaded from outside this file.
+  - One skill: delete the "overview" table. Several skills: keep it, and repeat the <section class="skill"> block.
+  - Verdict class: "ok" (No problems found), "warn" (Install with changes), "bad" (Don't install).
+  - Keep each skill to one page: at most 3 risks, and at most 7 rows in "What it installs and runs"
+    (group similar rows, for example "its 5 scripts").
+  - Asks first class: "yes" for any prompt or question, "no" for pre-approved, load-time, a plugin hook or inside an
+    approved script.
+  - For "No problems found", retitle "Safer settings" as "Worth considering" when there are optional improvements.
+  - For a "Don't install" verdict, retitle "Safer settings" as "What would change the verdict" and say what would
+    have to be true, for example "audit the MCP server's code at a fixed commit".
+  - Context box: two short sentences, about 40 words: does the skill match the context, and what did it change.
+    No context given: write "none given". Context that the files contradict goes in bold.
+-->
+<style>
+@page { size: A4; margin: 14mm; }
+* { box-sizing: border-box; }
+body { font-family: "Segoe UI", "DejaVu Sans", Arial, sans-serif; color: #1b2430; font-size: 9.5pt; line-height: 1.4; margin: 0; }
+header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 3px solid #1f4e8c; padding-bottom: 5pt; margin-bottom: 8pt; }
+header h1 { font-size: 18pt; margin: 0; color: #1f4e8c; }
+header .meta { font-size: 9pt; color: #5b6675; text-align: right; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 3pt 5pt; border-bottom: 1px solid #d5dce6; vertical-align: top; }
+th { font-size: 8.5pt; color: #5b6675; text-transform: uppercase; letter-spacing: .5pt; }
+.overview { margin-bottom: 10pt; }
+.overview td:first-child { white-space: nowrap; }
+.skill { margin-bottom: 10pt; }
+.skill + .skill { page-break-before: always; }
+.top { display: flex; justify-content: space-between; align-items: center; }
+.top h2 { font-size: 16pt; margin: 0; }
+.verdict { font-weight: 700; font-size: 11pt; padding: 3pt 10pt; border-radius: 12pt; white-space: nowrap; }
+.ok { background: #e3f4ea; color: #1e7a4f; } .warn { background: #fdf0dc; color: #a15c00; } .bad { background: #fbe3e3; color: #b42318; }
+.oneline { font-size: 10.5pt; margin: 4pt 0 8pt; }
+.facts { display: grid; grid-template-columns: 1fr 1fr; gap: 5pt; margin-bottom: 6pt; }
+.fact { background: #eef2f8; border-radius: 6pt; padding: 4pt 8pt; }
+.fact b { display: block; font-size: 8.5pt; color: #5b6675; text-transform: uppercase; letter-spacing: .5pt; }
+.fact.wide { grid-column: 1 / -1; }
+h3 { font-size: 10.5pt; color: #1f4e8c; margin: 8pt 0 3pt; }
+ol { margin: 0; padding-left: 16pt; } li { margin-bottom: 3pt; }
+.yes { color: #1e7a4f; font-weight: 700; } .no { color: #b42318; font-weight: 700; }
+pre { background: #f4f6f9; border: 1px solid #d5dce6; border-radius: 4pt; padding: 6pt 8pt; font-size: 8.5pt; white-space: pre-wrap; margin: 0; }
+footer { margin-top: 8pt; padding-top: 4pt; border-top: 1px solid #d5dce6; font-size: 8pt; color: #5b6675; }
+code { font-family: Consolas, "DejaVu Sans Mono", monospace; font-size: 9pt; }
+</style></head>
+<body>
+
+<header>
+  <h1>Skill audit summary</h1>
+  <div class="meta">{{TARGET}}<br>{{YYYY-MM-DD}} · {{standard / deep}}</div>
+</header>
+
+<table class="overview">
+  <tr><th>Skill</th><th>Verdict</th><th>In one line</th></tr>
+  <tr><td><b>{{SKILL_NAME}}</b></td><td><span class="verdict {{ok/warn/bad}}">{{VERDICT}}</span></td><td>{{WHY}}</td></tr>
+</table>
+
+<section class="skill">
+  <div class="top"><h2>{{SKILL_NAME}}</h2><span class="verdict {{ok/warn/bad}}">{{VERDICT}}</span></div>
+  <p class="oneline">{{WHY, in one or two plain sentences}}</p>
+
+  <div class="facts">
+    <div class="fact"><b>Runs without asking</b>{{the pre-approved tools and commands, in plain words}}</div>
+    <div class="fact"><b>Can start by itself</b>{{Yes, when … / No, only when you type /name}}</div>
+    <div class="fact"><b>Installs</b>{{N things, all after asking / X without asking / nothing}}</div>
+    <div class="fact"><b>Connects to</b>{{domains, or "nothing"}}</div>
+    <div class="fact wide"><b>Context</b>{{what you said about it, whether the files match, and what that changed; or "none given"}}</div>
+    <div class="fact wide"><b>Where it comes from</b>{{owner, repo age, stars, release, and anything that made the verdict stricter; or "not checked"}}. Popularity never improves the verdict.</div>
+  </div>
+
+  <h3>Top risks</h3>
+  <ol>
+    <li><b>{{RISK}}.</b> {{WHY IT MATTERS}} <i>Fix: {{FIX}}</i></li>
+  </ol>
+
+  <h3>What it installs and runs</h3>
+  <table>
+    <tr><th>What</th><th>When</th><th>Asks you first?</th></tr>
+    <tr><td>{{NAME}}</td><td>{{WHEN}}</td><td><span class="{{yes/no}}">{{Yes / No}}</span>: {{how}}</td></tr>
+  </table>
+
+  <h3>Safer settings</h3>
+  <pre>before: {{original allowed-tools line}}
+after:  {{hardened allowed-tools line}}</pre>
+</section>
+
+<footer>
+  Full report: <code>{{REPORT_FILE}}.md</code>. Version audited: {{commit hash, or "SHA-256 of each file, in the full report"}}.
+  A review lowers risk but can't prove a skill safe; split-up commands can slip past it, so run skills you don't trust in a sandbox. Re-audit after every update.
+</footer>
+</body></html>
