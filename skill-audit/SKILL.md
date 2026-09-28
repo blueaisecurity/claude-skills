@@ -174,8 +174,9 @@ system temp folder each time: a browser that is already open otherwise takes ove
   `"/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge"`
 - Linux: the same options with `google-chrome`, `chromium` or `microsoft-edge`
 
-Check that the PDF exists. If there is no browser, or printing fails, skip the PDF and give the path of the HTML
-page instead: it opens in any browser, which can print it to PDF.
+Check that the PDF exists. The first run sometimes writes nothing and reports no error: run the same command once
+more with another new profile folder, then try the other browser. If there is no browser, or printing still fails,
+skip the PDF and give the path of the HTML page instead: it opens in any browser, which can print it to PDF.
 
 Reply in chat with:
 - the verdict and a one-line reason
