@@ -124,7 +124,14 @@ Read `references/checklist.md` once, then:
    Explain every false positive in one line, so the user learns what's normal.
 6. **Dependencies:** `requirements.txt`, `package.json` (install hooks), `pyproject.toml`. Look for unpinned versions,
    installs from URLs or git, and names that look like typos of popular packages. Say that dependencies weren't audited recursively.
-7. **`deep` mode:** read every remaining file in full too.
+7. **List everything it installs or runs, and everywhere it connects,** for the report's two tables. Include
+   programs and packages (pip, npm, winget, brew, apt), libraries its scripts import that aren't part of the
+   language, its own scripts, shell commands written in `SKILL.md` and in scripts, browser scripts, and every
+   address it contacts. For each: when it happens, whether the user is asked first, the version (pinned, minimum
+   or newest) and where it comes from. A command inside a script runs without its own prompt once the script is
+   approved, so mark it "No: inside a script you approved". An install behind the skill's own question gets a
+   permission prompt too; say both.
+8. **`deep` mode:** read every remaining file in full too.
 
 ## Step 4: verdict
 
@@ -158,6 +165,7 @@ If the current folder is a git repository, tell the user, so the report isn't co
 Reply in chat with:
 - the verdict and a one-line reason
 - **what it can do without asking**, in plain words
+- **what it installs and runs**, in one line: how many things, and whether you're asked before each
 - the top 3 risks (or "none found")
 - the hardening changes, if any
 - where the report is saved, and the version audited

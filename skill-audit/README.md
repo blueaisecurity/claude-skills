@@ -9,7 +9,9 @@ runs a pre-approved command the moment you start the skill, before Claude has re
 
 - **what it can do without asking you**, entry by entry, in plain language: pre-approved tools, commands that run
   when the skill loads, and hooks
-- **what it reads, runs, and where it can send data**
+- **everything it installs and runs**, in one table: programs, packages, libraries, scripts and commands, each
+  with its version and whether you're asked first
+- **where it connects and what it reads and writes**
 - **what's hidden**: obfuscated code, encoded commands, invisible Unicode, instructions in HTML comments
 - **whether it tries to manipulate Claude**: "ignore previous instructions", "don't tell the user", fake "the user approved"
 - **for plugins, what runs on its own**: hooks that fire on events and MCP servers that start programs

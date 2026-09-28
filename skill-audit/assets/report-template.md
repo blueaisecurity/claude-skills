@@ -28,11 +28,23 @@ Hooks in the frontmatter, and plugin parts that run on their own (hooks, MCP ser
 
 Instruction files inside the target (`CLAUDE.md`, `AGENTS.md`, `.claude/`): {{list, or "none"}}
 
-## Data flows
+## What it installs and runs
+
+| What | Type | When | Asks you first? | Version | From |
+|---|---|---|---|---|---|
+| `{{name}}` | {{program / package / library / its own script / shell command / browser script}} | {{step, and on what condition}} | {{No: pre-approved / No: runs when the skill loads / No: inside a script you approved / Yes: permission prompt / Yes: the skill asks, then a permission prompt}} | {{pinned / minimum / newest / n/a}} | {{winget, PyPI, npm, a URL, bundled, already on your computer}} |
+
+In short: it installs {{N}} things, {{all after asking / X without asking}}, and runs {{M}} commands or scripts, {{all after asking / X without asking}}.
+
+## Where it connects
+
+| Address | What for | When | Asks you first? |
+|---|---|---|---|
+| `{{domain}}` | {{what it gets or sends}} | {{step or condition}} | {{Yes / No: pre-approved / No: inside a script you approved}} |
+
+## What it reads and writes
 
 - **Reads:** {{files, folders, environment variables}}
-- **Runs:** {{programs and commands}}
-- **Sends data to / downloads from:** {{domains, or "nothing"}}
 - **Writes:** {{where}}
 
 ## Findings
