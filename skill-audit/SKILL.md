@@ -43,8 +43,10 @@ Input: `$ARGUMENTS` (if you see that literal text, read the target from the user
   to audit in place.
 - **Local folder or `SKILL.md`:** use it directly.
 - **`.zip`:** extract it into a new, empty temporary folder (the command asks the user first):
-  `tar -xf "<skill.zip>" -C "<temp-folder>"` on Windows and macOS, `unzip -q "<skill.zip>" -d "<temp-folder>"` on Linux.
-  Both skip entries that try to leave the folder (`..` or absolute paths); report any such entries.
+  on Windows `C:\Windows\System32\tar.exe -xf "<skill.zip>" -C "<temp-folder>"` (name it in full: the `tar` in
+  Git Bash can't open zip files), on macOS `tar -xf "<skill.zip>" -C "<temp-folder>"`, on Linux
+  `unzip -q "<skill.zip>" -d "<temp-folder>"`. These skip entries that try to leave the folder (`..` or absolute
+  paths), and Windows tar then ends with "Path contains '..'" and an error code. Report any such entry as a ⛔ finding.
 - **GitHub URL:** clone into a new temporary folder. This command is deliberately not pre-approved, so the user sees it:
   `git -c core.symlinks=false clone --depth 1 --no-recurse-submodules -- "<repo-url>" "<temp-folder>/<repo-name>"`.
   The `--` stops a crafted URL from being read as git options, and leaving out submodules and symlinks closes the
