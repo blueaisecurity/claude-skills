@@ -62,19 +62,7 @@ Copy-Item -Recurse -Force yt-notes "$HOME\.claude\skills\"
 Claude Code picks up the new skill without a restart. If the `skills` folder did not exist when the
 session started, run `/reload-skills` once.
 
-## 3. How Claude finds and runs a skill
-
-1. **When a session starts,** Claude Code reads only the name and description of each skill.
-2. **When you run it** (`/yt-notes ...`), Claude loads the full `SKILL.md` and follows its steps in order.
-3. **Scripts and templates** in the skill folder are opened only when a step needs them.
-4. **Same skill in two places?** This order decides which one runs: your organisation's managed skills
-   first, then personal (`~/.claude/skills`), then project (`.claude/skills`). So a personal copy of
-   `yt-notes` wins over a project copy.
-
-Claude can also start a skill by itself when your request matches its description. `yt-notes` is set to run
-only when you type `/yt-notes`. `skill-audit` can also start when you ask Claude to check a skill; it only reads.
-
-## 4. Use yt-notes
+## 3. Use yt-notes
 
 ```
 /yt-notes <video-or-playlist-link> [max-pages] [compare] [overview-only] [focus]
@@ -95,7 +83,7 @@ It needs Node.js. Python 3 is optional and makes getting captions faster; the sk
 anything. It keeps its work files, including full transcripts, in `yt-notes-work/` in your project, with a
 `.gitignore` inside so git leaves them alone. Setup and what the PDFs contain: [yt-notes/README.md](yt-notes/README.md).
 
-## 5. Use skill-audit
+## 4. Use skill-audit
 
 ```
 /skill-audit <skill-folder | github-url | skill.zip> [deep]
@@ -130,6 +118,18 @@ If a file is flagged: check which file it is, read it, and if you restore it, ad
 never for a whole folder. Anything that holds attack patterns as data, such as a signature list or a test skill with
 planted attacks, stays out of the skill folders. If we publish any, it goes in its own folder with a warning, so
 installing a skill never brings you such a file.
+
+## Good to know: how Claude finds and runs a skill
+
+1. **When a session starts,** Claude Code reads only the name and description of each skill.
+2. **When you run it** (`/yt-notes ...`), Claude loads the full `SKILL.md` and follows its steps in order.
+3. **Scripts and templates** in the skill folder are opened only when a step needs them.
+4. **Same skill in two places?** This order decides which one runs: your organisation's managed skills
+   first, then personal (`~/.claude/skills`), then project (`.claude/skills`). So a personal copy of
+   `yt-notes` wins over a project copy.
+
+Claude can also start a skill by itself when your request matches its description. `yt-notes` is set to run
+only when you type `/yt-notes`. `skill-audit` can also start when you ask Claude to check a skill; it only reads.
 
 ## License
 
