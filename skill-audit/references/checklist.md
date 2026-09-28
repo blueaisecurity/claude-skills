@@ -95,3 +95,21 @@ Also look at: HTML comments in `.md` files (invisible when rendered, visible to 
 - A plugin hook that runs a formatter or linter on your own files after an edit: common, but check the exact command.
 - An MCP server with a pinned version from the publisher named in the plugin's description: expected; unpinned or
   from someone else: flag it.
+
+## 5. Reputation and provenance (can only make the verdict stricter)
+
+Popularity is not safety. Stars can be bought, popular repos change owner, and attackers copy well-known names.
+So these signals can raise the verdict to a stricter one, and never lower it.
+
+| Signal | Effect on the verdict |
+|---|---|
+| The skill's or repo's name copies a well-known skill or package from a different owner, often with a random ending (`youtube-summarize-11y0i`) | ⛔ **Don't install**, unless the user confirms the source |
+| The repo or the owner's account is less than about 30 days old, yet has many stars | At least ⚠️; say "check who published this" |
+| The URL redirects to a different owner (the repo was transferred or renamed) and the code changed since | At least ⚠️; say so |
+| The package the skill installs is owned by someone other than the repo's owner, or points to a different repo | At least ⚠️ |
+| The audited commit is not a tagged release, or the default branch is ahead of the last release | Note it; suggest installing a release |
+| An archived repo, or open reports of security problems | Note it |
+| Many stars, an old repo, a known owner, signed or provenance-backed releases | Note it as context. **Never improves the verdict** |
+
+Report the numbers you found (stars, forks, created date, last push, owner account age, latest release) with the
+date you looked them up, since they change.

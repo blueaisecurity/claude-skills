@@ -35,6 +35,7 @@ th { font-size: 8.5pt; color: #5b6675; text-transform: uppercase; letter-spacing
 .facts { display: grid; grid-template-columns: 1fr 1fr; gap: 5pt; margin-bottom: 6pt; }
 .fact { background: #eef2f8; border-radius: 6pt; padding: 4pt 8pt; }
 .fact b { display: block; font-size: 8.5pt; color: #5b6675; text-transform: uppercase; letter-spacing: .5pt; }
+.fact.wide { grid-column: 1 / -1; }
 h3 { font-size: 10.5pt; color: #1f4e8c; margin: 8pt 0 3pt; }
 ol { margin: 0; padding-left: 16pt; } li { margin-bottom: 3pt; }
 .yes { color: #1e7a4f; font-weight: 700; } .no { color: #b42318; font-weight: 700; }
@@ -63,6 +64,7 @@ code { font-family: Consolas, "DejaVu Sans Mono", monospace; font-size: 9pt; }
     <div class="fact"><b>Can start by itself</b>{{Yes, when … / No, only when you type /name}}</div>
     <div class="fact"><b>Installs</b>{{N things, all after asking / X without asking / nothing}}</div>
     <div class="fact"><b>Connects to</b>{{domains, or "nothing"}}</div>
+    <div class="fact wide"><b>Where it comes from</b>{{owner, repo age, stars, release, and anything that made the verdict stricter; or "not checked"}}. Popularity never improves the verdict.</div>
   </div>
 
   <h3>Top risks</h3>

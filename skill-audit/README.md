@@ -18,6 +18,9 @@ runs a pre-approved command the moment you start the skill, before Claude has re
   approved", or instructions fetched from the web after you reviewed it
 - **for plugins, what runs on its own**: hooks that fire on events and MCP servers that start programs
 - **install tricks**: install hooks in `package.json`, unpinned packages, and zips with entries that try to escape
+- **where it comes from**: owner, repo age, stars, releases, and names that copy a well-known skill. These can only
+  make the verdict stricter: stars can be bought, so popularity never makes a risky skill look safe. The lookups use
+  the network, so they ask first
 - a verdict: **✅ No red flags found · ⚠️ Install with changes · ⛔ Don't install**
 - a **hardened** version of its permissions
 - a **full report**, plus a **one-page PDF summary** per skill

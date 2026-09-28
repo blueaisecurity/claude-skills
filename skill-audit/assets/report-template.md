@@ -42,6 +42,20 @@ In short: it installs {{N}} things, {{all after asking / X without asking}}, and
 |---|---|---|---|
 | `{{domain}}` | {{what it gets or sends}} | {{step or condition}} | {{Yes / No: pre-approved / No: inside a script you approved}} |
 
+## Reputation and provenance
+
+Looked up on {{YYYY-MM-DD}}, or "not checked" (local folder, or the user declined the network lookup).
+
+| Signal | Found | Effect on the verdict |
+|---|---|---|
+| Owner | {{name, account created YYYY-MM}} | {{none / stricter because …}} |
+| Repo | {{created YYYY-MM, last push YYYY-MM-DD, N stars, N forks}} | {{none / stricter because …}} |
+| Name | {{original / copies "…" from another owner}} | {{none / ⛔}} |
+| Release | {{audited commit is tag … / not a tagged release}} | {{none / note}} |
+| Packages it installs | {{owner and repo match / differ}} | {{none / stricter because …}} |
+
+Rule: these signals can make the verdict stricter, never better.
+
 ## What it reads and writes
 
 - **Reads:** {{files, folders, environment variables}}
