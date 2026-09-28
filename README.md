@@ -115,8 +115,8 @@ own Read, Grep and Glob tools and never runs anything from the skill it checks. 
 ## Before you install any skill
 
 A skill can run commands on your computer: its `allowed-tools` line can let commands run without asking you,
-a line like `` !`command` `` in its `SKILL.md` runs a command the moment you start it, and its scripts run with
-your rights. Read its `SKILL.md` and scripts first, or run `/skill-audit` on it. That goes for ours too.
+a line like `` !`command` `` in its `SKILL.md` runs a pre-approved command the moment you start it, before
+Claude reads anything, and its scripts run with your rights. Read its `SKILL.md` and scripts first, or run `/skill-audit` on it. That goes for ours too.
 
 ## If your antivirus flags a file
 

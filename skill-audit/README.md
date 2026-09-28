@@ -2,8 +2,8 @@
 
 Installing a Claude skill is like installing software. Its `allowed-tools` line can let commands run
 **without a permission prompt**, and its scripts run with **your** user rights. A skill that pre-approves
-`python scripts/setup.py` pre-approves every line of `setup.py`. A line like `` !`command` `` in `SKILL.md`
-runs a command the moment you start the skill, with no prompt at all.
+`python scripts/setup.py` pre-approves every line of `setup.py`. And a line like `` !`command` `` in `SKILL.md`
+runs a pre-approved command the moment you start the skill, before Claude has read a word of it.
 
 `skill-audit` tells you, before you install or update a skill:
 
@@ -80,7 +80,7 @@ never brings you a file your antivirus may flag.
   loads that subfolder's `CLAUDE.md` files and skills. So downloads are audited in a temporary folder outside your
   project, and it asks you to move a download that sits inside it. For extra safety while you check skills you
   don't trust, set `"disableSkillShellExecution": true` in your Claude Code settings, so no skill's load-time
-  commands run.
+  commands run, even ones your own allow rules would let through.
 - **It never modifies the original skill.** Hardened copies go to a new folder, on request.
 
 ## Limits

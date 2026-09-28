@@ -69,8 +69,8 @@ Read `references/checklist.md`, then:
    (case-insensitive, with line numbers). Note each hit as `file:line`.
 3. **Sort what you found**, per skill:
    - **RUNS WITHOUT ASKING:** each `allowed-tools` entry, its risk and why (checklist section 1). An entry inherits
-     the worst finding in the script it pre-approves. Also list every load-time command (checklist section 1a) and
-     every `hooks` entry in the frontmatter: they run without asking too. So do plugin hooks and MCP servers.
+     the worst finding in the script it pre-approves. Also list every load-time command (checklist section 1a), with
+     the entry that pre-approves it, and every `hooks` entry in the frontmatter: they run without asking too. So do plugin hooks and MCP servers.
    - **FRONTMATTER / STRUCTURE:** auto-invocation combined with risky tools, over-broad descriptions, pre-approved
      scripts that don't exist.
    - **FINDINGS**, most severe first. Mark with ★ any finding inside a pre-approved script, a hook or an MCP server
@@ -94,12 +94,16 @@ Read `references/checklist.md` once, then:
    and self-updating code.
 3. **Read every load-time command and every frontmatter hook in full.** An exclamation mark written directly before
    a command in backticks, or a code block whose opening fence ends in an exclamation mark, runs a shell command the
-   moment the skill is invoked, before Claude reads the rest, and Claude Code never asks the user first. (This file
-   describes the syntax in words on purpose, so that it holds no such command itself.) Only the user's deny rules, or `"disableSkillShellExecution": true` in their
-   settings, stop it. A skill with an empty `allowed-tools` line can still run commands this way. `hooks` in the
-   frontmatter are registered when the skill runs and keep running on events for the rest of the session. Rate each
-   one like a pre-approved command: a fixed, read-only command (such as `git status`) is low; anything that installs,
-   downloads, runs a script or sends data is critical.
+   moment the skill is invoked, before Claude reads the rest. (This file describes the syntax in words on purpose,
+   so that it holds no such command itself.) Claude Code never shows a prompt for it. It checks the command against
+   the user's permission rules: when the skill's own `allowed-tools` or the user's allow rules match it, it runs
+   silently, and Claude never gets a chance to judge it first. Outside auto mode, anything else stops the skill from
+   loading; in auto mode it goes through auto mode's checks. `"disableSkillShellExecution": true` in the user's
+   settings turns these commands off. `hooks` in the frontmatter are registered when the skill runs and keep running
+   on events for the rest of the session. Rate each one like a pre-approved command, paired with the `allowed-tools`
+   entry that approves it: a fixed, read-only command (such as `git status`) is low; anything that installs,
+   downloads, runs a script or sends data is critical. A load-time command that nothing pre-approves is medium: it
+   depends on the user's own rules.
 4. **Plugins: read every hook and MCP server entry in full** (`hooks/hooks.json`, `.mcp.json`, and `hooks` or
    `mcpServers` in `plugin.json`). Hooks run shell commands on events, such as every tool call or session start,
    as soon as the plugin is enabled, with nobody invoking anything. MCP servers start programs, often packages

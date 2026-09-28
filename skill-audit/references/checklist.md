@@ -22,13 +22,14 @@ tool (case-insensitive, over the whole skill folder) and read every hit in conte
 
 | Check | Why it matters |
 |---|---|
-| An exclamation mark directly before a command in backticks | Runs a shell command the moment the skill is invoked, before Claude reads the skill, and Claude Code never asks first. Only the user's deny rules or `"disableSkillShellExecution": true` stop it. It works even when `allowed-tools` is empty |
+| An exclamation mark directly before a command in backticks | Runs a shell command the moment the skill is invoked, before Claude reads the skill. It never shows a prompt: when the skill's own `allowed-tools` or the user's allow rules match it, it runs silently, and Claude never gets to judge it. Outside auto mode, anything else stops the skill from loading; in auto mode it goes through auto mode's checks. `"disableSkillShellExecution": true` turns these commands off |
 | A code block whose opening fence (three backticks) is followed by an exclamation mark | The same, for several lines of commands |
 
 This file describes the syntax in words on purpose, so that it holds no such command itself.
 
-Rate each one like a pre-approved command: a fixed, read-only command (`git status`, `date`) is low; anything that
-installs, downloads, runs a script or sends data is critical.
+Rate each one like a pre-approved command, paired with the `allowed-tools` entry that approves it: a fixed, read-only
+command (`git status`, `date`) is low; anything that installs, downloads, runs a script or sends data is critical. A
+load-time command that nothing pre-approves is medium: whether it runs depends on the user's own rules.
 
 ## 1b. Plugin parts (they run without anyone invoking a skill)
 
