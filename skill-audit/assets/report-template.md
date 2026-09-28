@@ -68,9 +68,13 @@ Rule: these signals can make the verdict stricter, never better.
 ## Findings
 
 ### Must fix / reasons not to install
-| # | Where | What | Assessment |
-|---|---|---|---|
-| 1 | `{{file:line}}` | {{finding}} | {{Suspicious / Malicious}}: {{why}} |
+| # | Where | What | Risk | Assessment |
+|---|---|---|---|---|
+| 1 | `{{file:line}}` | {{finding}} | {{CRITICAL/HIGH/MEDIUM/LOW}}{{, "for this team; X otherwise" when the context raised it}} | {{Suspicious / Malicious}}: {{why}} |
+
+### Decisions for you
+{{Only with context: what the skill's core job means for this audience, for example which account to use, whose
+data goes where, and whether consent is needed. Or delete this section.}}
 
 ### Expected for its purpose (false positives)
 | Where | Flag | Why it's fine |
