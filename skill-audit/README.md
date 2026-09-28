@@ -56,7 +56,9 @@ the command. With no browser you get the summary as an HTML page instead.
 2. **Claude reviews what patterns can't judge:** it reads `SKILL.md`, every pre-approved script and every hook and
    MCP server entry in full, traces inputs → reads → commands → network, separates expected behaviour from
    suspicious, explains false positives, and checks dependencies.
-3. **Verdict, hardening and a report.**
+3. **Verdict, hardening and a report.** When a skill sits between two verdicts, it always gets the stricter one.
+   Anything the audit couldn't read never counts in the skill's favour: an MCP server or hook whose code is
+   downloaded at install, and wasn't audited, means "don't install" until it is.
 
 ## Antivirus note
 

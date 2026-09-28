@@ -66,6 +66,16 @@ XOR-encrypted copy of the whole skill in `.git/skillpack.dat` behind a plain-loo
 | `SKILL.md` refers to a file the skill doesn't contain (for example a `WORKFLOW.md` it never ships) | A cover that points to instructions a decoder will create. ⛔ if a script would create it, otherwise a low finding |
 | A file whose bytes look random or are one long encoded string | Can't be reviewed by reading. Say so, and don't clear the skill on the strength of a review |
 
+## 1e. Code it pulls in, and where your data goes
+
+| Check | Why it matters |
+|---|---|
+| An MCP server, hook or plugin part whose code is not in the audited files (a setup step clones or downloads it) | It runs without a prompt, in every session, and you never saw its code. ⛔ until that code is audited too, at a fixed commit |
+| A setup step that fetches code from a URL or git repo and runs it (`git clone` then run, `pip install git+https://...`, `curl ... \| sh`) | Download-and-execute, even when it looks like a normal install. ⛔ if it then runs without a prompt; otherwise at least ⚠️, and more so at an unpinned `main` |
+| A named package from PyPI or npm | Normal. Pinned is fine; unpinned or a minimum version only is ⚠️ |
+| The skill sends your links, files or text to a service | List every service in the report. One that the description, `SKILL.md` and README don't name is at least ⚠️. Name each in the one-line reason if it gets everything by default |
+| Faking an identity to get past another site's access controls (a Googlebot user agent, a spoofed `X-Forwarded-For`, paywall or login bypass) | Not a risk to your machine, but a legal and terms risk to whoever runs it, including an employer. At least ⚠️, and say so |
+
 ## 2. Grep patterns (the Step 2 sweep)
 
 | Category | Pattern (regex, case-insensitive) |
