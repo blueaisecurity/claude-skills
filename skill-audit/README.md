@@ -32,7 +32,10 @@ runs a pre-approved command the moment you start the skill, before Claude has re
 | `/skill-audit ~/.claude/skills` | All your installed personal skills, with a summary table |
 | `/skill-audit ./some-skill deep` | Also reads every file in full, not only flagged and pre-approved ones |
 
-The report is saved as `skill-audit-<name>-<date>.md` in your current folder.
+The full report is saved as `skill-audit-<name>-<date>.md` in your current folder, with a short PDF summary
+next to it: one page per skill with the verdict, what runs without asking, what it installs, where it connects,
+the top risks and safer settings. The PDF is printed with the Edge or Chrome you already have, after you approve
+the command. With no browser you get the summary as an HTML page instead.
 
 ## How it works
 
@@ -99,7 +102,8 @@ audit it: **re-audit on every update**, and use Claude Code's deny rules and san
 | Claude Code, one project | Copy it to `<project>/.claude/skills/skill-audit/` |
 | Claude apps | First delete the `argument-hint` line at the top of your copy of `SKILL.md`: the apps accept only `name`, `description`, `allowed-tools`, `license`, `compatibility` and `metadata`. Then zip the folder so the zip holds `skill-audit/SKILL.md`, and add it in **Customize > Skills** (code execution must be on) |
 
-It needs nothing beyond Claude's own Read, Grep and Glob, plus git if you audit a GitHub URL.
+It needs nothing beyond Claude's own Read, Grep and Glob, plus git if you audit a GitHub URL, and Edge or
+Chrome for the PDF summary.
 
 ## Files
 
@@ -107,7 +111,8 @@ It needs nothing beyond Claude's own Read, Grep and Glob, plus git if you audit 
 skill-audit/
 ├── SKILL.md                  instructions Claude follows
 ├── references/checklist.md   what to check, and the Grep patterns for the sweep
-└── assets/report-template.md report layout
+├── assets/report-template.md report layout
+└── assets/report-summary.html one-page summary, printed to PDF (blocks scripts and outside loads)
 ```
 
 ## License

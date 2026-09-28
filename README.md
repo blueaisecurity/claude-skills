@@ -96,7 +96,8 @@ anything. It keeps its work files, including full transcripts, in `yt-notes-work
 | `/skill-audit ~/.claude/skills` | All your installed personal skills, with a summary table |
 
 You get a verdict (no red flags found, install with changes, or don't install), what the skill can do without
-asking you, the top risks, and safer permissions, in a report next to where you run it. It only uses Claude's
+asking you, everything it installs and runs, the top risks, and safer permissions. It comes as a full report and
+a short PDF summary, next to where you run it. It only uses Claude's
 own Read, Grep and Glob tools and never runs anything from the skill it checks. Details:
 [skill-audit/README.md](skill-audit/README.md).
 

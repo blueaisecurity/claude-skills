@@ -1,5 +1,7 @@
 # Audit output and working files
 skill-audit-*.md
+skill-audit-*.html
+skill-audit-*.pdf
 *.zip
 # Tooling
 __pycache__/

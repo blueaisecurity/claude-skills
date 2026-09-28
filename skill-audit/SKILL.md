@@ -162,12 +162,27 @@ Fill in `assets/report-template.md` and save it as `skill-audit-<skill-name>-<YY
 folder, never inside the audited skill. Use today's local date as the user sees it, not the UTC date. For several skills, write one report with a summary table first.
 If the current folder is a git repository, tell the user, so the report isn't committed by accident.
 
+**Then a short PDF summary**, one page per skill, for readers who won't open the full report. Fill
+`assets/report-summary.html` and save it next to the report as `skill-audit-<skill-name>-<YYYY-MM-DD>.html`.
+Escape `<`, `>` and `&` in any text you copy from the audited skill; the template's security policy also blocks
+scripts and anything loaded from outside the file. Print it with the Edge or Chrome that is already installed.
+The command asks first; never install a browser for this. Use full paths, and a new, empty profile folder in the
+system temp folder each time: a browser that is already open otherwise takes over the command and writes nothing.
+- Windows: `"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" --headless=new --no-pdf-header-footer --user-data-dir="<temp-folder>\skill-audit-pdf-<random>" --print-to-pdf="<report>.pdf" "file:///<report>.html"`,
+  or the same with `"C:\Program Files\Google\Chrome\Application\chrome.exe"`
+- macOS: the same options with `"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"` or
+  `"/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge"`
+- Linux: the same options with `google-chrome`, `chromium` or `microsoft-edge`
+
+Check that the PDF exists. If there is no browser, or printing fails, skip the PDF and give the path of the HTML
+page instead: it opens in any browser, which can print it to PDF.
+
 Reply in chat with:
 - the verdict and a one-line reason
 - **what it can do without asking**, in plain words
 - **what it installs and runs**, in one line: how many things, and whether you're asked before each
 - the top 3 risks (or "none found")
 - the hardening changes, if any
-- where the report is saved, and the version audited
+- where the report and the PDF summary are saved, and the version audited
 
 Keep the chat short; the details go in the report.
