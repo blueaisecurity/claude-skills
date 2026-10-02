@@ -2,19 +2,22 @@
 // Usage: node render_pdf.js input.html output.pdf [--max N] [--source URL]
 // Prints PAGES, WORDS and READ_MIN (at 220 words per minute). With --max it prints OVER_LIMIT when too long.
 // Uses the browser already on the machine (Edge, then Chrome), so nothing big is downloaded.
-// One-time setup:  npm i playwright-core      (a few MB, no browser download)
+// One-time setup:  npm i -g playwright-core@1.63.0      (a few MB, no browser download)
 const path = require('path');
 const fs = require('fs');
 const { execSync } = require('child_process');
 
 function load() {
-  // Look in the current folder first (where "npm i playwright-core" puts it), then next to this script, then global.
-  const paths = [process.cwd(), __dirname];
-  try { paths.push(execSync('npm root -g').toString().trim()); } catch (e) {}
+  // Load playwright-core only from the global npm folder. Never from the current folder: the skill runs this
+  // script from its work folder, where Claude can write files, so a planted node_modules there must not load.
+  // npm runs from this script's own folder for the same reason (on Windows, cmd.exe looks in the current
+  // folder before PATH).
+  let root = '';
+  try { root = execSync('npm root -g', { cwd: __dirname }).toString().trim(); } catch (e) {}
   for (const mod of ['playwright-core', 'playwright']) {
-    try { return require(require.resolve(mod, { paths })); } catch (e) {}
+    try { if (root) return require(path.join(root, mod)); } catch (e) {}
   }
-  console.error('MISSING_PLAYWRIGHT: run  npm i playwright-core  in this folder (or npm i -g playwright-core) and retry.');
+  console.error('MISSING_PLAYWRIGHT: run  npm i -g playwright-core@1.63.0  and retry.');
   process.exit(1);
 }
 
@@ -34,9 +37,12 @@ const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(
     try { browser = await chromium.launch(channel ? { channel } : {}); used = channel || 'bundled chromium'; break; }
     catch (e) {}
   }
-  if (!browser) { console.error('NO_BROWSER: install Edge or Chrome, or run  npx playwright install chromium'); process.exit(1); }
+  if (!browser) { console.error('NO_BROWSER: install Edge or Chrome, then retry.'); process.exit(1); }
 
-  const page = await browser.newPage();
+  // The notes HTML is written from untrusted text (transcripts, web pages). So while printing, page scripts are
+  // off, and only local files may load: an injected <img src="https://..."> must not reach the network.
+  const page = await browser.newPage({ javaScriptEnabled: false });
+  await page.route('**/*', r => (r.request().url().startsWith('file:') ? r.continue() : r.abort()));
   const abs = path.resolve(input).replace(/\\/g, '/');
   await page.goto('file://' + (abs.startsWith('/') ? '' : '/') + abs);
   const words = await page.evaluate(() => (document.body.innerText.match(/\S+/g) || []).length);

@@ -3,6 +3,8 @@ name: skill-audit
 description: Audits a Claude skill, plugin, or a folder, repo or zip of skills for security risks before you install or update it. It checks what runs without asking (allowed-tools, plugin hooks and MCP servers), what bundled scripts can do, network calls, credential access, obfuscation, hidden Unicode and prompt-injection instructions, then gives a verdict and a hardened version. Use for /skill-audit, or when asked to check, vet, review or audit a skill or plugin.
 argument-hint: <skill-folder | github-url | skill.zip> [deep] [context: who made it, where it came from, who will use it]
 allowed-tools: Read, Grep, Glob
+metadata:
+  version: "1.0.0"
 ---
 
 # Skill audit

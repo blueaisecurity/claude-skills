@@ -1,8 +1,9 @@
 """Download a YouTube video's subtitles as timestamped text using yt-dlp.
 
-Usage: python get_transcript.py <url> [--out transcript.txt] [--lang en] [--install-ytdlp]
+Usage: python get_transcript.py <url> [--out transcript.txt] [--lang en]
 Prints BLOCKED if YouTube can't be reached, NO_SUBTITLES if the video has none.
-Prints NEED_YTDLP if yt-dlp isn't installed; ask the user, then run again with --install-ytdlp.
+Prints NEED_YTDLP if yt-dlp isn't installed. This script never installs anything: SKILL.md asks the user and
+runs the pip command itself, so the user sees the exact command in the permission prompt.
 Writes <out> (text) and <out-stem>.meta.json (title, channel, date, duration, chapters).
 """
 import argparse
@@ -13,21 +14,16 @@ import json
 import os
 import re
 import shutil
-import subprocess
 import sys
 import tempfile
 
 
-def ensure_ytdlp(install):
+def ensure_ytdlp():
     try:
         import yt_dlp  # noqa: F401
     except ImportError:
-        if not install:
-            print("NEED_YTDLP: yt-dlp isn't installed. Ask the user first, then run again with --install-ytdlp.")
-            sys.exit(4)
-        cmd = [sys.executable, "-m", "pip", "install", "-q", "yt-dlp>=2026.8.19"]  # minimum version; YouTube changes often, so no exact pin
-        if subprocess.call(cmd) != 0:
-            subprocess.call(cmd + ["--break-system-packages"])
+        print("NEED_YTDLP: yt-dlp isn't installed.")
+        sys.exit(4)
 
 
 def ts(sec):
@@ -74,10 +70,9 @@ def main():
     ap.add_argument("url")
     ap.add_argument("--out", default="transcript.txt")
     ap.add_argument("--lang", default="en")
-    ap.add_argument("--install-ytdlp", action="store_true", help="install yt-dlp with pip if it's missing (ask the user first)")
     a = ap.parse_args()
 
-    ensure_ytdlp(a.install_ytdlp)
+    ensure_ytdlp()
     import yt_dlp
 
     tmp = tempfile.mkdtemp()

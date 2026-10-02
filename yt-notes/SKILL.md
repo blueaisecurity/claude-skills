@@ -3,7 +3,9 @@ name: yt-notes
 description: Turns a YouTube video (including 2+ hour videos) or a whole playlist into a visual study-guide PDF of a chosen length, with a summary, diagrams, main points, plain-language explanations, a "learn and memorise" section and self-test questions, and optionally compares it with similar videos and articles. Run it with /yt-notes followed by a YouTube video or playlist link, max pages and compare choice.
 argument-hint: <video-or-playlist-url> [max-pages] [compare: no|articles|videos|both] [overview-only] [focus]
 disable-model-invocation: true
-allowed-tools: Bash(python --version), Bash(py --version), Bash(python3 --version), Read, Write, WebSearch, WebFetch
+allowed-tools: Bash(python --version), Bash(py --version), Bash(python3 --version), Read, Edit(./yt-notes-work/**), WebSearch
+metadata:
+  version: "3.1.0"
 ---
 
 # YouTube video → study-guide PDF
@@ -78,7 +80,9 @@ Then ask **one** AskUserQuestion call with only the questions that apply:
 - **"Compare this video with other sources?"** (if `compare` wasn't passed) Options: `No` · `Articles only` ·
   `Videos and articles`.
 - **"Python isn't installed. Install it for faster captions?"** (only if Python is missing) Options:
-  `Install Python`: Python 3.12 for this user only, plus yt-dlp, about 40 MB · `Use the browser instead`.
+  `Install Python`: about 40 MB, plus yt-dlp (Windows: Python 3.12 for this user, winget accepts its license
+  terms for you; macOS: the newest Python from Homebrew; Linux: the system Python with sudo) ·
+  `Use the browser instead`.
 
 **Never install anything without a yes to that question.** If AskUserQuestion isn't available, ask in plain text.
 If nobody answers (unattended run), use **5 pages, no comparison, no installs** (the browser route), and state that
@@ -102,10 +106,14 @@ In playlist mode, add the scope question from **P2** to this same call.
 ```bash
 python "<skill-dir>/scripts/get_transcript.py" "<url>" --out transcript.txt
 ```
-It writes timestamped text plus `transcript.meta.json` (length, chapters, description).
-Add `--install-ytdlp` only if the user agreed to the install in Step 0b.
-- `NEED_YTDLP` → yt-dlp is missing. Ask once: "yt-dlp isn't installed. Install it with pip (about 10 MB)?"
-  On a yes, run again with `--install-ytdlp`; on a no, go to B.
+It writes timestamped text plus `transcript.meta.json` (length, chapters, description). The script never
+installs anything itself.
+- `NEED_YTDLP` → yt-dlp is missing. If the user already agreed to installs in Step 0b, go on; otherwise ask once:
+  "yt-dlp isn't installed. Install it with pip (about 10 MB)?" On a no, go to B. On a yes, run this as its own
+  command, with the same Python, so the user sees exactly what is installed, then run the script again:
+  `(cd "<skill-dir>" && python -m pip install "yt-dlp>=2026.8.19")`. Always from the skill's own folder, never
+  from the work folder: `python -m` runs a file named `pip.py` from the current folder first. If pip fails, say so
+  in one line and go to B. Never retry with `--break-system-packages`.
 - `BLOCKED` or `NO_SUBTITLES` → go to B.
 
 **B. Browser** (Claude in Chrome, or the app's built-in browser; whichever is connected):
@@ -257,8 +265,8 @@ It prints `PAGES`, `WORDS` and `READ_MIN`. Put `READ_MIN` and `PAGES` on the cov
 If `WORDS` is over the word budget, tighten the text. If it prints `OVER_LIMIT`, trim in the cut order above (or merge sparse sections) and
 render again until it fits. Well under the limit is fine; don't pad.
 It uses Edge or Chrome, whichever is already installed, so no browser gets downloaded.
-- If it prints `MISSING_PLAYWRIGHT`: ask the user once, then run `npm i playwright-core` in the working folder
-  (a few MB) and retry.
+- If it prints `MISSING_PLAYWRIGHT`: ask the user once, then run `npm i -g playwright-core@1.63.0` (a few MB, the
+  tested version, installed once for the user and not into their project) and retry.
 - If Node itself is missing: use the `pdf` skill, or any HTML-to-PDF route available.
 
 ## Step 5: check and deliver
@@ -428,14 +436,16 @@ result;
 ```
 
 - **Captions (shell route):** only with Python and yt-dlp installed, or after the user agreed to install them
-  (Step 0b; then `pip install "yt-dlp>=2026.8.19"`); then
-  `yt-dlp --skip-download --write-subs --write-auto-subs --sub-langs "en.*" --sub-format vtt -o "v.%(ext)s" "<url>"`
+  (Step 0b; then `(cd "<skill-dir>" && python -m pip install "yt-dlp>=2026.8.19")`); then
+  `yt-dlp --ignore-config --skip-download --write-subs --write-auto-subs --sub-langs "en.*" --sub-format vtt -o "v.%(ext)s" "<url>"`
   and read the `.vtt` file, ignoring repeated lines.
 - **PDF:** write one self-contained HTML file with the Step 3 sections (A4, `@page { size: A4; margin: 16mm }`,
   one `<section style="page-break-after:always">` per group, a blue accent `#1f4e8c`, tables for main points,
   bordered blocks for concepts, a two-column grid for flashcards). Render it with Playwright's `page.pdf()`
   using `chromium.launch({ channel: 'msedge' })` or `'chrome'` so no browser is downloaded, and put
-  `Source: <video URL>` plus page numbers in `footerTemplate`.
+  `Source: <video URL>` plus page numbers in `footerTemplate`. Print with page scripts off
+  (`newPage({ javaScriptEnabled: false })`) and abort every request that isn't a `file:` URL, as
+  `scripts/render_pdf.js` does: the notes are written from untrusted text.
   Draw diagrams as inline `<svg viewBox="0 0 640 H">` blocks: rounded `<rect>` boxes (fill `#e8eef7`, stroke `#1f4e8c`),
   `<line>`/`<path>` arrows with a `<marker>` arrowhead, text of at least 11px, and a `<figcaption>`.
   If that isn't possible, use the `pdf` skill.
