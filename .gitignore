@@ -1,0 +1,11 @@
+# Work folders and reports from running the skills: they can hold full transcripts
+yt-notes-work/
+skill-audit-*.md
+skill-audit-*.html
+skill-audit-*.pdf
+# Tooling
+node_modules/
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
